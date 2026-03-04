@@ -3,6 +3,7 @@ node_modules/
 
 # Build output
 main.js
+*.zip
 
 # Obsidian plugin data
 data.json
