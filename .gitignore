@@ -4,6 +4,7 @@ node_modules/
 # Build output
 main.js
 *.zip
+RELEASE_NOTES.md
 
 # Obsidian plugin data
 data.json
