@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES6",
+    "lib": ["ES6", "DOM", "ES2015.Promise"],
+    "sourceMap": true,
+    "rootDir": "src",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
