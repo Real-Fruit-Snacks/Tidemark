@@ -6,214 +6,174 @@
   <img alt="Tidemark" src="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-dark.svg" width="520">
 </picture>
 
-![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
 ![Platform](https://img.shields.io/badge/platform-Obsidian-7C3AED)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 **Obsidian plugin for variable substitution in markdown via YAML frontmatter**
 
-Define variables in YAML frontmatter, reference them with `{{variable}}` syntax anywhere in your document, then copy or replace with a single command. Supports nested properties, arrays, default values, and syntax highlighting. Perfect for pentesting workflows, CTF notes, and reusable note templates.
-
-[Quick Start](#quick-start) • [Variable Syntax](#variable-syntax) • [Commands](#commands) • [Configuration](#configuration) • [Use Cases](#use-cases) • [Architecture](#architecture)
+Define variables in YAML frontmatter, reference them with `{{variable}}` syntax anywhere in your
+document, then copy or replace with a single command. Supports nested properties, arrays, default
+values, and syntax highlighting.
 
 </div>
 
 ---
 
-## Highlights
-
-<table>
-<tr>
-<td width="50%">
-
-**Variable Replacement**
-Replace `{{variables}}` with YAML frontmatter values on demand. Copy to clipboard or permanently replace in-document. Supports nested properties, arrays, and default values.
-
-**Syntax Highlighting**
-Color-coded variables in the editor: green for existing values, orange for variables with defaults, red for missing. See variable status at a glance without running anything.
-
-**Nested Properties**
-Access nested YAML with dot notation: `{{server.ip}}`, `{{credentials.user}}`. Array indexing with `{{items[0]}}`. Toggle nesting on or off per your workflow.
-
-</td>
-<td width="50%">
-
-**Quick Copy**
-Copy current line, selection, or entire document with variables replaced directly to clipboard. Paste commands straight into your terminal with values already filled in.
-
-**Variable List & Context Menu**
-Use List All Variables to see every variable grouped by status, edit values, and navigate to locations. Right-click any variable to set its value directly.
-
-**Flexible Configuration**
-Custom delimiters, default values, case-insensitive matching, array join separators, missing value text, notification levels. Every aspect is configurable through Obsidian settings.
-
-</td>
-</tr>
-</table>
-
----
-
 ## Quick Start
-
-### Prerequisites
-
-<table>
-<tr>
-<th>Requirement</th>
-<th>Version</th>
-<th>Purpose</th>
-</tr>
-<tr>
-<td>Obsidian</td>
-<td>1.0+</td>
-<td>Plugin host</td>
-</tr>
-<tr>
-<td>Node.js</td>
-<td>18+</td>
-<td>Building from source (optional)</td>
-</tr>
-</table>
 
 ### Install
 
-**From Community Plugins:**
+**Community Plugins (recommended):**
+
 1. Open Obsidian Settings > Community Plugins
 2. Click "Browse" and search for "Tidemark"
 3. Click Install, then Enable
 
-**Manual Installation:**
+**Manual:**
+
 ```bash
-# Download from latest release
-# Copy main.js, manifest.json, styles.css to .obsidian/plugins/tidemark/
+# Download main.js, manifest.json, styles.css from latest release
+# Copy to .obsidian/plugins/tidemark/
 ```
 
 ### Build from Source
 
+Prerequisites: Node.js 18+.
+
 ```bash
-# Clone repository
 git clone https://github.com/Real-Fruit-Snacks/Tidemark.git
 cd Tidemark
 
-# Install dependencies
 npm install
-
-# Build plugin
 npm run build
 
-# Copy to vault
+# Copy to your vault
 cp main.js manifest.json styles.css /path/to/vault/.obsidian/plugins/tidemark/
 ```
 
-### Verification
+### Verify
 
-```bash
-# Open Obsidian
-# Settings > Community Plugins > Enable Tidemark
-# Create a note with frontmatter variables
-# Open Command Palette > "Tidemark: Copy current line (replaced)"
+```
+1. Enable the plugin in Obsidian Settings > Community Plugins
+2. Create a note with YAML frontmatter variables
+3. Open Command Palette (Ctrl+P) > "Tidemark: Copy current line (replaced)"
 ```
 
 ---
 
-## Variable Syntax
+## Features
 
-### Basic Variable
+### Variable Replacement
 
-```
-{{variableName}}
-```
-
-### Variable with Default Value
-
-```
-{{port:1-1000}}
-{{username:root}}
-{{protocol:https}}
-```
-
-### Nested Properties (Dot Notation)
+Define variables in YAML frontmatter and reference them with `{{variable}}` syntax. Copy to clipboard or permanently replace in-document with a single command.
 
 ```markdown
 ---
-target:
+target_ip: 10.10.10.1
+port: 8080
+user: admin
+---
+
+# Recon
+
+nmap -sV -sC {{target_ip}}
+curl http://{{target_ip}}:{{port}}
+ssh {{user}}@{{target_ip}}
+```
+
+### Default Values
+
+Provide fallback values with the `:` separator. If the variable is not defined in frontmatter, the default is used instead.
+
+```markdown
+{{port:443}}          # uses 443 if port not in frontmatter
+{{protocol:https}}    # uses https if not defined
+{{username:root}}     # uses root if not defined
+```
+
+### Nested Properties
+
+Access nested YAML structures with dot notation. Array values are automatically joined.
+
+```markdown
+---
+server:
   ip: 10.10.10.1
   port: 8080
 credentials:
   user: admin
----
-
-curl http://{{target.ip}}:{{target.port}}
-ssh {{credentials.user}}@{{target.ip}}
-```
-
-### Array Handling
-
-```markdown
----
+  pass: hunter2
 ports:
   - 22
   - 80
   - 443
 ---
 
+curl http://{{server.ip}}:{{server.port}}
+ssh {{credentials.user}}@{{server.ip}}
 Open ports: {{ports}}
 # Result: Open ports: 22, 80, 443
 ```
 
----
+### Syntax Highlighting
 
-## Commands
+Variables are color-coded in the editor for instant visual feedback:
+
+```
+Green   →  variable has a value in frontmatter
+Orange  →  variable not set but has a default value
+Red     →  no value and no default (missing)
+```
+
+Colors adapt to light and dark themes automatically. Override with custom hex values in settings.
+
+### Commands
 
 Access via Command Palette (Ctrl/Cmd+P), then type "Tidemark":
 
-| Command | Description |
-|---------|-------------|
-| **Copy current line (replaced)** | Copy line to clipboard with variables replaced |
-| **Copy selection (replaced)** | Copy selected text with variables replaced |
-| **Copy document (replaced)** | Copy entire document with variables replaced |
-| **Replace in selection** | Permanently replace variables in selection |
-| **Replace all in document** | Replace all variables in document body |
-| **Replace in document and filename** | Replace in document and rename file |
-| **Rename file (replace variables)** | Rename file with variables replaced |
-| **List all variables** | View and edit all variables |
-| **Set variable value** | Set/edit variable at cursor position |
+```
+Copy current line (replaced)       →  copy line with variables filled
+Copy selection (replaced)          →  copy selection with variables filled
+Copy document (replaced)           →  copy entire note with variables filled
+Replace in selection               →  permanently replace in selection
+Replace all in document            →  replace all variables in body
+Replace in document and filename   →  replace in body and rename file
+Rename file (replace variables)    →  rename file with variables filled
+List all variables                 →  view/edit all variables by status
+Set variable value                 →  set value at cursor position
+```
 
-Configure keyboard shortcuts in Obsidian Settings > Hotkeys > search "Tidemark".
+### Variable List
 
----
+The "List all variables" command opens a panel showing every variable grouped by status. Edit values inline, navigate to variable locations in the document, and see which variables are missing at a glance.
 
-## Configuration
+### Context Menu
 
-Access via Settings > Community Plugins > Tidemark:
+Right-click any highlighted variable to set its value directly from the context menu without opening settings or the command palette.
 
-### Delimiters
+### Configuration
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `openDelimiter` | `{{` | Characters marking variable start |
-| `closeDelimiter` | `}}` | Characters marking variable end |
-| `defaultSeparator` | `:` | Separator for default values (`{{var:default}}`) |
+All settings accessible via Obsidian Settings > Community Plugins > Tidemark:
 
-### Behavior
+```
+Delimiters:
+  openDelimiter       →  {{ (default)
+  closeDelimiter      →  }} (default)
+  defaultSeparator    →  :  (default)
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `missingValueText` | `[MISSING]` | Text when variable not found |
-| `supportNestedProperties` | `true` | Enable dot notation for nested properties |
-| `caseInsensitive` | `false` | Match variables regardless of case |
-| `arrayJoinSeparator` | `, ` | Characters used to join array values |
-| `preserveOriginalOnMissing` | `false` | Keep `{{var}}` if not found instead of replacing |
-| `notificationLevel` | `all` | `all`, `errors`, or `none` |
+Behavior:
+  missingValueText    →  [MISSING]
+  supportNested       →  true
+  caseInsensitive     →  false
+  arrayJoinSeparator  →  ", "
+  preserveOnMissing   →  false
+  notificationLevel   →  all | errors | none
 
-### Visual
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `highlightVariables` | `true` | Color-code variables in editor |
-| `highlightColors.exists` | auto | Color for set variables |
-| `highlightColors.missing` | auto | Color for missing variables |
-| `highlightColors.hasDefault` | auto | Color for variables with defaults |
+Visual:
+  highlightVariables  →  true
+  custom colors       →  per-status hex overrides
+```
 
 ---
 
@@ -221,28 +181,20 @@ Access via Settings > Community Plugins > Tidemark:
 
 ### Pentesting Workflow
 
-Create template notes for different target types:
+Create template notes for different target types. Fill in frontmatter, then copy commands with values already substituted:
 
 ```markdown
 ---
-IPAddress:
-hostname:
+IPAddress: 10.10.10.50
+hostname: target.htb
+wordlist: /usr/share/wordlists/dirb/common.txt
 ---
 
-# Recon Commands
 nmap -sV -sC {{IPAddress}}
 nikto -h {{IPAddress}}
-gobuster dir -u http://{{IPAddress}} -w /path/to/wordlist
-
-# Quick Shell
-nc {{IPAddress}} {{port:4444}}
+gobuster dir -u http://{{IPAddress}} -w {{wordlist}}
+echo "{{IPAddress}} {{hostname}}" >> /etc/hosts
 ```
-
-**Workflow:**
-1. Duplicate template for each target
-2. Fill in frontmatter values
-3. Use **Copy current line (replaced)** to copy commands with values filled
-4. Paste directly into terminal
 
 ### CTF Notes
 
@@ -256,43 +208,25 @@ url: http://ctf.example.com
 # {{challenge}}
 
 Target: {{url}}
-Flag: {{flag}}
-
-# Commands
 curl {{url}}/robots.txt
 sqlmap -u "{{url}}/login" --batch
+Flag: {{flag}}
 ```
 
-### Project Templates
+### Reusable Templates
 
 ```markdown
 ---
-project: My New Project
+project: My Project
 author: {{author:Anonymous}}
 date: {{date:TBD}}
-repo: {{repo:github.com/user/repo}}
 ---
 
 # {{project}}
 
 **Author:** {{author}}
 **Date:** {{date}}
-**Repository:** {{repo}}
 ```
-
----
-
-## Syntax Highlighting
-
-Variables are automatically color-coded in your editor:
-
-| Color | Status | Meaning |
-|-------|--------|---------|
-| Green | Exists | Variable has a value in frontmatter |
-| Orange | Has Default | Variable not set but has a default value |
-| Red | Missing | No value and no default |
-
-Colors adapt to light/dark themes automatically (Catppuccin Latte/Mocha). Override with custom hex values in settings.
 
 ---
 
@@ -300,174 +234,36 @@ Colors adapt to light/dark themes automatically (Catppuccin Latte/Mocha). Overri
 
 ```
 Tidemark/
-├── package.json                      # Dependencies and scripts
-├── tsconfig.json                     # TypeScript configuration
-├── esbuild.config.mjs                # esbuild bundler config
-├── manifest.json                     # Obsidian plugin manifest
-├── styles.css                        # Plugin styles
-│
 ├── src/
-│   ├── main.ts                       # Plugin entry point, command registration
-│   ├── variableReplacer.ts           # Core replacement engine
-│   ├── frontmatterParser.ts          # YAML frontmatter extraction and parsing
-│   ├── decorationProvider.ts         # CodeMirror syntax highlighting decorations
-│   ├── types.ts                      # TypeScript interfaces and types
-│   │
-│   ├── commands/                     # ── Command Handlers ──
-│   │   └── ...                       # Copy, replace, list, rename commands
-│   │
-│   └── utils/                        # ── Utilities ──
-│       └── ...                       # String helpers, YAML utilities
-│
-├── assets/                           # ── Repository Assets ──
-│   └── banner.svg                    # Project banner (Catppuccin themed)
-│
-├── docs/                             # ── GitHub Pages ──
-│   ├── index.html                    # Project website
-│   └── assets/
-│       ├── logo-dark.svg             # Logo for dark theme
-│       └── logo-light.svg            # Logo for light theme
-│
-└── .github/
-    └── workflows/                    # CI/CD pipelines
+│   ├── main.ts                # Plugin entry point, command registration
+│   ├── variableReplacer.ts    # Core replacement engine
+│   ├── frontmatterParser.ts   # YAML frontmatter extraction
+│   ├── decorationProvider.ts  # CodeMirror syntax highlighting
+│   ├── types.ts               # TypeScript interfaces
+│   ├── commands/              # Command handlers
+│   └── utils/                 # String helpers, YAML utilities
+├── manifest.json              # Obsidian plugin manifest
+├── esbuild.config.mjs         # Build configuration
+└── docs/                      # GitHub Pages site
 ```
 
----
-
-## Tips & Tricks
-
-### Quick Command Execution
-
-1. Write command templates in your note
-2. Position cursor on command line
-3. Use "Copy current line (replaced)" from the command palette
-4. Paste in terminal
-5. Execute
-
-### Bulk Updates
-
-Use **List all variables** to:
-- See all variables at once
-- Quickly identify missing values
-- Edit multiple values in sequence
-
-### Default Values Strategy
-
-Use default values for common scenarios:
-
-```
-{{port:443}}
-{{protocol:https}}
-{{method:GET}}
-{{timeout:30}}
-```
-
----
-
-## Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| Variables not highlighting | Ensure "Highlight Variables" is enabled in plugin settings |
-| Variables not replacing | Check spelling (or enable case-insensitive); validate YAML syntax |
-| Commands not showing | Ensure plugin is enabled; check Command Palette for "Tidemark" |
-| Nested properties not resolving | Verify "Support Nested Properties" is enabled in settings |
+TypeScript plugin built with esbuild. The core replacement engine parses YAML frontmatter, resolves variable references (including nested dot-notation and array joins), and provides CodeMirror decorations for real-time syntax highlighting in the editor.
 
 ---
 
 ## Platform Support
 
-<table>
-<tr>
-<th>Capability</th>
-<th>Desktop</th>
-<th>Mobile (iOS)</th>
-<th>Mobile (Android)</th>
-</tr>
-<tr>
-<td>Variable Replacement</td>
-<td>Full</td>
-<td>Full</td>
-<td>Full</td>
-</tr>
-<tr>
-<td>Copy to Clipboard</td>
-<td>Full</td>
-<td>Full</td>
-<td>Full</td>
-</tr>
-<tr>
-<td>Syntax Highlighting</td>
-<td>Full</td>
-<td>Full</td>
-<td>Full</td>
-</tr>
-<tr>
-<td>Context Menu</td>
-<td>Full</td>
-<td>Limited</td>
-<td>Limited</td>
-</tr>
-<tr>
-<td>Nested Properties</td>
-<td>Full</td>
-<td>Full</td>
-<td>Full</td>
-</tr>
-<tr>
-<td>File Rename</td>
-<td>Full</td>
-<td>Full</td>
-<td>Full</td>
-</tr>
-</table>
-
----
-
-## Security
-
-### Vulnerability Reporting
-
-**Report security issues via:**
-- GitHub Security Advisories (preferred)
-- Private disclosure to maintainers
-- Responsible disclosure timeline (90 days)
-
-**Do NOT:**
-- Open public GitHub issues for vulnerabilities
-- Disclose before coordination with maintainers
+| Capability | Desktop | iOS | Android |
+|------------|---------|-----|---------|
+| Variable Replacement | Full | Full | Full |
+| Copy to Clipboard | Full | Full | Full |
+| Syntax Highlighting | Full | Full | Full |
+| Nested Properties | Full | Full | Full |
+| Context Menu | Full | Limited | Limited |
+| File Rename | Full | Full | Full |
 
 ---
 
 ## License
 
-MIT License
-
-Copyright &copy; 2026 Real-Fruit-Snacks
-
-```
-THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
-THE AUTHORS ARE NOT LIABLE FOR ANY DAMAGES ARISING FROM USE.
-```
-
----
-
-## Resources
-
-- **GitHub**: [github.com/Real-Fruit-Snacks/Tidemark](https://github.com/Real-Fruit-Snacks/Tidemark)
-- **Issues**: [Report a Bug](https://github.com/Real-Fruit-Snacks/Tidemark/issues)
-- **Security**: [SECURITY.md](SECURITY.md)
-- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
-
----
-
-<div align="center">
-
-**Part of the Real-Fruit-Snacks water-themed security toolkit**
-
-[Aquifer](https://github.com/Real-Fruit-Snacks/Aquifer) • [armsforge](https://github.com/Real-Fruit-Snacks/armsforge) • [Cascade](https://github.com/Real-Fruit-Snacks/Cascade) • [Conduit](https://github.com/Real-Fruit-Snacks/Conduit) • [Deadwater](https://github.com/Real-Fruit-Snacks/Deadwater) • [Deluge](https://github.com/Real-Fruit-Snacks/Deluge) • [Depth](https://github.com/Real-Fruit-Snacks/Depth) • [Dew](https://github.com/Real-Fruit-Snacks/Dew) • [Droplet](https://github.com/Real-Fruit-Snacks/Droplet) • [Fathom](https://github.com/Real-Fruit-Snacks/Fathom) • [Flux](https://github.com/Real-Fruit-Snacks/Flux) • [Grotto](https://github.com/Real-Fruit-Snacks/Grotto) • [HydroShot](https://github.com/Real-Fruit-Snacks/HydroShot) • [LigoloSupport](https://github.com/Real-Fruit-Snacks/LigoloSupport) • [Maelstrom](https://github.com/Real-Fruit-Snacks/Maelstrom) • [Rapids](https://github.com/Real-Fruit-Snacks/Rapids) • [Ripple](https://github.com/Real-Fruit-Snacks/Ripple) • [Riptide](https://github.com/Real-Fruit-Snacks/Riptide) • [Runoff](https://github.com/Real-Fruit-Snacks/Runoff) • [Seep](https://github.com/Real-Fruit-Snacks/Seep) • [Shallows](https://github.com/Real-Fruit-Snacks/Shallows) • [Siphon](https://github.com/Real-Fruit-Snacks/Siphon) • [Slipstream](https://github.com/Real-Fruit-Snacks/Slipstream) • [Spillway](https://github.com/Real-Fruit-Snacks/Spillway) • [Sunken-Archive](https://github.com/Real-Fruit-Snacks/Sunken-Archive) • [Surge](https://github.com/Real-Fruit-Snacks/Surge) • **Tidemark** • [Tidepool](https://github.com/Real-Fruit-Snacks/Tidepool) • [Undercurrent](https://github.com/Real-Fruit-Snacks/Undercurrent) • [Undertow](https://github.com/Real-Fruit-Snacks/Undertow) • [Vapor](https://github.com/Real-Fruit-Snacks/Vapor) • [Wellspring](https://github.com/Real-Fruit-Snacks/Wellspring) • [Whirlpool](https://github.com/Real-Fruit-Snacks/Whirlpool)
-
-*Remember: With great power comes great responsibility.*
-
-</div>
+[MIT](LICENSE) — Copyright 2026 Real-Fruit-Snacks
