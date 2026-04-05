@@ -1,1191 +1,688 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tidemark — Templates That Fill Themselves</title>
-  <meta name="description" content="Obsidian plugin to replace variables in markdown with YAML frontmatter values on demand. Perfect for pentesting workflows, CTF notes, and reusable templates.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%7B%7B%7D%7D%3C/text%3E%3C/svg%3E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <style>
-    /* =========================================================
-       TIDEMARK LANDING PAGE
-       Catppuccin Mocha palette — dark terminal aesthetic
-       ========================================================= */
-
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --ctp-rosewater: #f5e0dc;
-      --ctp-flamingo: #f2cdcd;
-      --ctp-pink: #f5c2e7;
-      --ctp-mauve: #cba6f7;
-      --ctp-red: #f38ba8;
-      --ctp-maroon: #eba0ac;
-      --ctp-peach: #fab387;
-      --ctp-yellow: #f9e2af;
-      --ctp-green: #a6e3a1;
-      --ctp-teal: #94e2d5;
-      --ctp-sky: #89dceb;
-      --ctp-sapphire: #74c7ec;
-      --ctp-blue: #89b4fa;
-      --ctp-lavender: #b4befe;
-      --ctp-text: #cdd6f4;
-      --ctp-subtext1: #bac2de;
-      --ctp-subtext0: #a6adc8;
-      --ctp-overlay2: #9399b2;
-      --ctp-overlay1: #7f849c;
-      --ctp-overlay0: #6c7086;
-      --ctp-surface2: #585b70;
-      --ctp-surface1: #45475a;
-      --ctp-surface0: #313244;
-      --ctp-base: #1e1e2e;
-      --ctp-mantle: #181825;
-      --ctp-crust: #11111b;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      scrollbar-width: thin;
-      scrollbar-color: var(--ctp-surface1) var(--ctp-crust);
-    }
-
-    body {
-      font-family: 'JetBrains Mono', monospace;
-      background-color: var(--ctp-crust);
-      color: var(--ctp-text);
-      line-height: 1.7;
-      font-size: 15px;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* ---- Dot-grid background pattern ---- */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: radial-gradient(var(--ctp-surface0) 1px, transparent 1px);
-      background-size: 24px 24px;
-      opacity: 0.3;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ---- CRT scanline overlay ---- */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 0, 0, 0.03) 2px,
-        rgba(0, 0, 0, 0.03) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ---- Layout ---- */
-    .page-wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    section {
-      margin-bottom: 96px;
-    }
-
-    a {
-      color: var(--ctp-blue);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    a:hover {
-      color: var(--ctp-sapphire);
-    }
-
-    /* ---- Section titles ---- */
-    .section-label {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--ctp-overlay0);
-      border: 1px solid var(--ctp-surface1);
-      padding: 4px 12px;
-      border-radius: 2px;
-      margin-bottom: 20px;
-    }
-
-    .section-title {
-      font-size: clamp(22px, 3vw, 30px);
-      font-weight: 700;
-      color: var(--ctp-text);
-      margin-bottom: 12px;
-      line-height: 1.3;
-    }
-
-    .section-desc {
-      color: var(--ctp-subtext0);
-      font-size: 14px;
-      max-width: 600px;
-      margin-bottom: 40px;
-    }
-
-    /* =========================================================
-       HERO
-       ========================================================= */
-    .hero {
-      padding: 80px 0 48px;
-      text-align: center;
-      margin-bottom: 64px;
-    }
-
-    .hero-terminal {
-      border: 1px solid var(--ctp-surface1);
-      border-radius: 8px;
-      background: var(--ctp-mantle);
-      max-width: 780px;
-      margin: 0 auto;
-      overflow: hidden;
-      box-shadow:
-        0 0 0 1px var(--ctp-surface0),
-        0 24px 80px -12px rgba(0, 0, 0, 0.6),
-        0 0 120px -40px rgba(203, 166, 247, 0.08);
-    }
-
-    .hero-titlebar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      background: var(--ctp-crust);
-      border-bottom: 1px solid var(--ctp-surface0);
-    }
-
-    .hero-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .hero-dot--red { background: var(--ctp-red); }
-    .hero-dot--yellow { background: var(--ctp-yellow); }
-    .hero-dot--green { background: var(--ctp-green); }
-
-    .hero-titlebar-text {
-      flex: 1;
-      text-align: center;
-      font-size: 12px;
-      color: var(--ctp-overlay0);
-      letter-spacing: 0.05em;
-    }
-
-    .hero-body {
-      padding: 48px 40px 56px;
-    }
-
-    .hero-title {
-      font-size: clamp(36px, 6vw, 64px);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.05;
-      margin-bottom: 8px;
-      background: linear-gradient(
-        135deg,
-        var(--ctp-mauve) 0%,
-        var(--ctp-blue) 40%,
-        var(--ctp-teal) 70%,
-        var(--ctp-green) 100%
-      );
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 40px rgba(203, 166, 247, 0.2));
-    }
-
-    .hero-cursor {
-      display: inline-block;
-      width: 3px;
-      height: 0.8em;
-      background: var(--ctp-mauve);
-      margin-left: 4px;
-      vertical-align: baseline;
-      animation: blink 1s step-end infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    .hero-tagline {
-      font-size: clamp(14px, 2vw, 17px);
-      color: var(--ctp-subtext0);
-      margin-bottom: 36px;
-      font-weight: 400;
-      line-height: 1.6;
-    }
-
-    .hero-tagline em {
-      color: var(--ctp-subtext1);
-      font-style: normal;
-    }
-
-    .hero-stats {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      margin-bottom: 36px;
-      flex-wrap: wrap;
-    }
-
-    .hero-stat {
-      text-align: center;
-    }
-
-    .hero-stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .hero-stat:nth-child(1) .hero-stat-value { color: var(--ctp-mauve); }
-    .hero-stat:nth-child(2) .hero-stat-value { color: var(--ctp-blue); }
-    .hero-stat:nth-child(3) .hero-stat-value { color: var(--ctp-green); }
-
-    .hero-stat-label {
-      font-size: 11px;
-      color: var(--ctp-overlay1);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 28px;
-      border-radius: 4px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .btn-primary {
-      background: var(--ctp-mauve);
-      color: var(--ctp-crust);
-      border-color: var(--ctp-mauve);
-    }
-
-    .btn-primary:hover {
-      background: var(--ctp-lavender);
-      border-color: var(--ctp-lavender);
-      color: var(--ctp-crust);
-      box-shadow: 0 0 24px rgba(203, 166, 247, 0.25);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--ctp-subtext1);
-      border-color: var(--ctp-surface1);
-    }
-
-    .btn-ghost:hover {
-      color: var(--ctp-text);
-      border-color: var(--ctp-overlay0);
-      background: var(--ctp-surface0);
-    }
-
-    /* =========================================================
-       FEATURES GRID
-       ========================================================= */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    .feature-card {
-      background: var(--ctp-mantle);
-      border: 1px solid var(--ctp-surface0);
-      border-radius: 6px;
-      padding: 28px 24px;
-      transition: all 0.25s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--ctp-blue), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .feature-card:hover {
-      border-color: var(--ctp-surface1);
-      background: var(--ctp-base);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.4);
-    }
-
-    .feature-card:hover::before {
-      opacity: 1;
-    }
-
-    .feature-icon {
-      font-size: 24px;
-      margin-bottom: 16px;
-      display: block;
-      width: 44px;
-      height: 44px;
-      line-height: 44px;
-      text-align: center;
-      background: var(--ctp-surface0);
-      border-radius: 8px;
-      border: 1px solid var(--ctp-surface1);
-    }
-
-    .feature-card h3 {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--ctp-text);
-      margin-bottom: 8px;
-    }
-
-    .feature-card p {
-      font-size: 13px;
-      color: var(--ctp-subtext0);
-      line-height: 1.6;
-    }
-
-    .feature-card:nth-child(1):hover { border-color: var(--ctp-mauve); }
-    .feature-card:nth-child(1):hover::before { background: linear-gradient(90deg, transparent, var(--ctp-mauve), transparent); }
-
-    .feature-card:nth-child(2):hover { border-color: var(--ctp-blue); }
-    .feature-card:nth-child(2):hover::before { background: linear-gradient(90deg, transparent, var(--ctp-blue), transparent); }
-
-    .feature-card:nth-child(3):hover { border-color: var(--ctp-green); }
-    .feature-card:nth-child(3):hover::before { background: linear-gradient(90deg, transparent, var(--ctp-green), transparent); }
-
-    .feature-card:nth-child(4):hover { border-color: var(--ctp-peach); }
-    .feature-card:nth-child(4):hover::before { background: linear-gradient(90deg, transparent, var(--ctp-peach), transparent); }
-
-    .feature-card:nth-child(5):hover { border-color: var(--ctp-teal); }
-    .feature-card:nth-child(5):hover::before { background: linear-gradient(90deg, transparent, var(--ctp-teal), transparent); }
-
-    .feature-card:nth-child(6):hover { border-color: var(--ctp-red); }
-    .feature-card:nth-child(6):hover::before { background: linear-gradient(90deg, transparent, var(--ctp-red), transparent); }
-
-    .feature-card:nth-child(7):hover { border-color: var(--ctp-yellow); }
-    .feature-card:nth-child(7):hover::before { background: linear-gradient(90deg, transparent, var(--ctp-yellow), transparent); }
-
-    .feature-card:nth-child(8):hover { border-color: var(--ctp-flamingo); }
-    .feature-card:nth-child(8):hover::before { background: linear-gradient(90deg, transparent, var(--ctp-flamingo), transparent); }
-
-    /* =========================================================
-       VARIABLE SYNTAX
-       ========================================================= */
-    .capabilities-section {
-      text-align: center;
-    }
-
-    .capabilities-terminal {
-      border: 1px solid var(--ctp-surface1);
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--ctp-mantle);
-      box-shadow:
-        0 0 0 1px var(--ctp-surface0),
-        0 32px 80px -16px rgba(0, 0, 0, 0.5),
-        0 0 160px -60px rgba(203, 166, 247, 0.06);
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .capabilities-titlebar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      background: var(--ctp-crust);
-      border-bottom: 1px solid var(--ctp-surface0);
-    }
-
-    .capabilities-titlebar-text {
-      flex: 1;
-      text-align: center;
-      font-size: 12px;
-      color: var(--ctp-overlay0);
-    }
-
-    .capabilities-body {
-      padding: 32px;
-    }
-
-    .capabilities-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .capability-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border: 1px solid var(--ctp-surface0);
-      border-radius: 4px;
-      background: var(--ctp-base);
-      font-size: 13px;
-      color: var(--ctp-subtext1);
-      transition: all 0.2s;
-    }
-
-    .capability-pill:hover {
-      border-color: var(--ctp-surface2);
-      background: var(--ctp-surface0);
-    }
-
-    .capability-pill .detail {
-      font-size: 11px;
-      color: var(--ctp-overlay0);
-      margin-left: auto;
-    }
-
-    .capability-pill .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .dot--basic { background: var(--ctp-mauve); }
-    .dot--nested { background: var(--ctp-blue); }
-    .dot--format { background: var(--ctp-green); }
-    .dot--config { background: var(--ctp-peach); }
-
-    .capabilities-legend {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      flex-wrap: wrap;
-      font-size: 12px;
-      color: var(--ctp-overlay1);
-    }
-
-    .capabilities-legend span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* =========================================================
-       COMMANDS
-       ========================================================= */
-    .arch-terminal {
-      border: 1px solid var(--ctp-surface1);
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--ctp-mantle);
-      box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.4);
-    }
-
-    .arch-titlebar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      background: var(--ctp-crust);
-      border-bottom: 1px solid var(--ctp-surface0);
-    }
-
-    .arch-titlebar-text {
-      flex: 1;
-      text-align: center;
-      font-size: 12px;
-      color: var(--ctp-overlay0);
-    }
-
-    .arch-body {
-      padding: 32px;
-    }
-
-    .arch-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-    }
-
-    .arch-item {
-      padding: 20px;
-      border: 1px solid var(--ctp-surface0);
-      border-radius: 4px;
-      background: var(--ctp-base);
-    }
-
-    .arch-item-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .arch-item-marker {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--ctp-crust);
-      background: var(--ctp-mauve);
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
-
-    .arch-item:nth-child(2) .arch-item-marker { background: var(--ctp-blue); }
-    .arch-item:nth-child(3) .arch-item-marker { background: var(--ctp-green); }
-    .arch-item:nth-child(4) .arch-item-marker { background: var(--ctp-teal); }
-
-    .arch-item h3 {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--ctp-text);
-    }
-
-    .arch-item p {
-      font-size: 13px;
-      color: var(--ctp-subtext0);
-      line-height: 1.6;
-    }
-
-    .arch-item code {
-      font-size: 12px;
-      color: var(--ctp-mauve);
-      background: var(--ctp-surface0);
-      padding: 1px 6px;
-      border-radius: 3px;
-    }
-
-    .arch-divider {
-      border: none;
-      border-top: 1px dashed var(--ctp-surface1);
-      margin: 28px 0;
-    }
-
-    .arch-stack {
-      font-size: 13px;
-      color: var(--ctp-subtext0);
-      text-align: center;
-    }
-
-    .arch-stack span {
-      display: inline-block;
-      padding: 4px 14px;
-      border: 1px solid var(--ctp-surface1);
-      border-radius: 3px;
-      margin: 4px;
-      background: var(--ctp-base);
-      color: var(--ctp-subtext1);
-      font-size: 12px;
-    }
-
-    /* =========================================================
-       USE CASES
-       ========================================================= */
-    .usage-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-
-    .usage-card {
-      border: 1px solid var(--ctp-surface0);
-      border-radius: 6px;
-      background: var(--ctp-mantle);
-      overflow: hidden;
-    }
-
-    .usage-card-header {
-      padding: 12px 16px;
-      background: var(--ctp-crust);
-      border-bottom: 1px solid var(--ctp-surface0);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--ctp-subtext1);
-      letter-spacing: 0.05em;
-    }
-
-    .usage-card-body {
-      padding: 16px 20px;
-    }
-
-    .usage-card-body .start-line {
-      font-size: 13px;
-      line-height: 1.7;
-      margin-bottom: 2px;
-    }
-
-    /* =========================================================
-       GETTING STARTED
-       ========================================================= */
-    .start-row {
-      display: flex;
-      gap: 40px;
-      align-items: flex-start;
-    }
-
-    .start-terminal {
-      border: 1px solid var(--ctp-surface1);
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--ctp-mantle);
-      box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.4);
-      flex: 1;
-      min-width: 0;
-    }
-
-    .start-titlebar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      background: var(--ctp-crust);
-      border-bottom: 1px solid var(--ctp-surface0);
-    }
-
-    .start-titlebar-text {
-      flex: 1;
-      text-align: center;
-      font-size: 12px;
-      color: var(--ctp-overlay0);
-    }
-
-    .start-body {
-      padding: 28px 32px;
-    }
-
-    .start-line {
-      margin-bottom: 4px;
-      font-size: 14px;
-      line-height: 1.8;
-    }
-
-    .start-line .prompt { color: var(--ctp-green); }
-    .start-line .cmd { color: var(--ctp-text); }
-    .start-line .comment { color: var(--ctp-overlay0); }
-    .start-line .flag { color: var(--ctp-peach); }
-    .start-line .arg { color: var(--ctp-yellow); }
-    .start-line .var-exists { color: var(--ctp-green); }
-    .start-line .var-default { color: var(--ctp-peach); }
-    .start-line .var-missing { color: var(--ctp-red); }
-    .start-line .yaml-key { color: var(--ctp-blue); }
-    .start-line .yaml-val { color: var(--ctp-green); }
-    .start-line .yaml-delim { color: var(--ctp-overlay0); }
-
-    .start-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .start-info p {
-      font-size: 14px;
-      color: var(--ctp-subtext0);
-      margin-bottom: 12px;
-      line-height: 1.7;
-    }
-
-    .start-info code {
-      font-size: 13px;
-      color: var(--ctp-mauve);
-      background: var(--ctp-surface0);
-      padding: 2px 8px;
-      border-radius: 3px;
-      border: 1px solid var(--ctp-surface1);
-    }
-
-    /* =========================================================
-       FOOTER
-       ========================================================= */
-    .site-footer {
-      border-top: 1px solid var(--ctp-surface0);
-      padding: 48px 0;
-      text-align: center;
-      margin-top: 32px;
-    }
-
-    .footer-tagline {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--ctp-subtext1);
-      margin-bottom: 24px;
-      letter-spacing: 0.02em;
-    }
-
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-    }
-
-    .footer-links a {
-      font-size: 13px;
-      color: var(--ctp-overlay1);
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover {
-      color: var(--ctp-blue);
-    }
-
-    .footer-copy {
-      font-size: 12px;
-      color: var(--ctp-overlay0);
-    }
-
-    /* =========================================================
-       RESPONSIVE
-       ========================================================= */
-    @media (max-width: 900px) {
-      .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .arch-grid {
-        grid-template-columns: 1fr;
-      }
-      .usage-grid {
-        grid-template-columns: 1fr;
-      }
-      .hero-body {
-        padding: 36px 24px 44px;
-      }
-      .start-row {
-        flex-direction: column;
-        gap: 24px;
-      }
-      .hero-stats {
-        gap: 24px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      body {
-        font-size: 14px;
-      }
-      .page-wrap {
-        padding: 0 16px;
-      }
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      .capabilities-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      section {
-        margin-bottom: 64px;
-      }
-      .hero {
-        padding: 48px 0 32px;
-      }
-      .hero-body {
-        padding: 28px 20px 36px;
-      }
-      .hero-buttons {
-        flex-direction: column;
-        align-items: center;
-      }
-      .btn {
-        width: 100%;
-        max-width: 260px;
-        justify-content: center;
-      }
-      .arch-body {
-        padding: 20px;
-      }
-      .start-body {
-        padding: 20px;
-      }
-      .start-line {
-        font-size: 12px;
-      }
-      .feature-card {
-        padding: 22px 20px;
-      }
-    }
-
-    /* ---- Selection highlight ---- */
-    ::selection {
-      background: rgba(203, 166, 247, 0.25);
-      color: var(--ctp-text);
-    }
-
-    /* ---- Focus styles for accessibility ---- */
-    a:focus-visible,
-    .btn:focus-visible {
-      outline: 2px solid var(--ctp-mauve);
-      outline-offset: 2px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tidemark — Variable Substitution for Obsidian</title>
+    <meta name="description" content="Obsidian plugin for variable substitution in markdown via YAML frontmatter. Nested properties, syntax highlighting, copy with replacement.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #f38ba8;
+            --maroon: #eba0ac;
+            --pink: #f5c2e7;
+            --mauve: #cba6f7;
+            --lavender: #b4befe;
+            --blue: #89b4fa;
+            --sapphire: #74c7ec;
+            --sky: #89dceb;
+            --teal: #94e2d5;
+            --green: #a6e3a1;
+            --yellow: #f9e2af;
+            --peach: #fab387;
+            --text: #cdd6f4;
+            --subtext1: #bac2de;
+            --subtext0: #a6adc8;
+            --overlay2: #9399b2;
+            --overlay1: #7f849c;
+            --overlay0: #6c7086;
+            --surface2: #585b70;
+            --surface1: #45475a;
+            --surface0: #313244;
+            --base: #1e1e2e;
+            --mantle: #181825;
+            --crust: #11111b;
+            --accent1: #cba6f7;
+            --accent2: #f5c2e7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--base);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, var(--overlay0) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.4;
+        }
+
+        ::selection { background: rgba(203, 166, 247, 0.3); color: var(--text); }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--mantle);
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-size: 0.88em;
+            color: var(--green);
+        }
+
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 28px; }
+
+        /* ── Hero ── */
+        .hero {
+            padding: 100px 0 70px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--surface1), transparent);
+        }
+
+        .hero-logo {
+            max-width: 440px;
+            margin: 0 auto 32px;
+        }
+
+        .hero-logo img { width: 100%; height: auto; }
+
+        .hero .subtitle {
+            font-size: clamp(15px, 2vw, 18px);
+            color: var(--subtext0);
+            max-width: 680px;
+            margin: 0 auto 28px;
+            line-height: 1.7;
+        }
+
+        /* ── Stats ── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin: 48px 0;
+        }
+
+        .stat {
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat:hover { transform: translateY(-2px); border-color: var(--surface2); }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent1);
+            line-height: 1;
+        }
+
+        .stat-label { font-size: 12px; color: var(--overlay1); margin-top: 6px; letter-spacing: 0.03em; }
+
+        /* ── CTAs ── */
+        .cta-group { display: flex; gap: 14px; justify-content: center; margin-top: 36px; }
+
+        .btn {
+            padding: 13px 32px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            letter-spacing: 0.03em;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: var(--crust);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 24px rgba(203, 166, 247, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface0);
+            color: var(--text);
+            border: 1px solid var(--surface1);
+        }
+
+        .btn-secondary:hover { background: var(--surface1); border-color: var(--surface2); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--subtext1);
+            border: 1px solid var(--surface1);
+        }
+
+        .btn-ghost:hover { background: var(--surface0); color: var(--text); }
+
+        /* ── Sections ── */
+        section { padding: 72px 0; }
+
+        section h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        section .section-desc {
+            font-size: 15px;
+            color: var(--subtext0);
+            margin-bottom: 44px;
+            max-width: 640px;
+            line-height: 1.7;
+        }
+
+        /* ── Feature Grid ── */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .feature {
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            padding: 28px;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .feature:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+            border-color: var(--surface2);
+        }
+
+        .feature:hover::before { opacity: 1; }
+
+        .feature h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent1);
+            margin-bottom: 10px;
+            letter-spacing: 0.02em;
+        }
+
+        .feature p { font-size: 13.5px; color: var(--subtext1); line-height: 1.65; }
+
+        /* ── Capabilities (Pills) ── */
+        .capabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+            gap: 10px;
+        }
+
+        .capability {
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 20px;
+            padding: 9px 18px;
+            font-size: 12.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .capability:hover { border-color: var(--surface2); background: var(--surface1); }
+
+        .cap-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .cap-dot.full { background: var(--green); }
+        .cap-dot.partial { background: var(--yellow); }
+
+        /* ── Architecture Cards ── */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .arch-card {
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            padding: 28px;
+            transition: border-color 0.2s;
+        }
+
+        .arch-card:hover { border-color: var(--surface2); }
+
+        .arch-num {
+            display: inline-flex;
+            width: 30px; height: 30px;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: var(--crust);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .arch-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--teal);
+            margin-bottom: 10px;
+        }
+
+        .arch-card p { font-size: 13.5px; color: var(--subtext1); line-height: 1.6; }
+
+        /* ── Terminal ── */
+        .terminal {
+            background: var(--mantle);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .terminal-bar {
+            background: var(--crust);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--surface0);
+        }
+
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .terminal-dot:nth-child(1) { background: var(--red); }
+        .terminal-dot:nth-child(2) { background: var(--yellow); }
+        .terminal-dot:nth-child(3) { background: var(--green); }
+        .terminal-label { flex: 1; text-align: center; font-size: 11px; color: var(--overlay0); font-family: 'JetBrains Mono', monospace; }
+
+        .terminal-body {
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .terminal-body pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+        .terminal-body .p { color: var(--green); }
+        .terminal-body .c { color: var(--overlay0); }
+        .terminal-body .v { color: var(--accent1); }
+        .terminal-body .f { color: var(--peach); }
+        .terminal-body .cursor {
+            display: inline-block;
+            width: 8px; height: 15px;
+            background: var(--text);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+        /* ── Two Column ── */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+
+        /* ── Footer ── */
+        footer {
+            border-top: 1px solid var(--surface1);
+            padding: 48px 0;
+            margin-top: 80px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .footer-grid h4 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text);
+            margin-bottom: 14px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .footer-grid ul { list-style: none; }
+        .footer-grid li { margin-bottom: 8px; }
+        .footer-grid a { color: var(--overlay2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+        .footer-grid a:hover { color: var(--accent1); }
+
+        .footer-grid p { font-size: 13px; color: var(--overlay1); line-height: 1.7; }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 1px solid var(--surface0);
+            font-size: 12px;
+            color: var(--overlay0);
+            letter-spacing: 0.02em;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 960px) {
+            .stats { grid-template-columns: repeat(3, 1fr); }
+            .two-col, .arch-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 0 16px; }
+            .hero { padding: 60px 0 48px; }
+            section { padding: 48px 0; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .cta-group { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 280px; text-align: center; }
+            .features { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+
+        a:focus-visible { outline: 2px solid var(--accent1); outline-offset: 2px; }
+    </style>
 </head>
 <body>
 
-<div class="page-wrap">
-
-  <!-- ============ HERO ============ -->
-  <section class="hero" id="top">
-    <div class="hero-terminal">
-      <div class="hero-titlebar">
-        <span class="hero-dot hero-dot--red"></span>
-        <span class="hero-dot hero-dot--yellow"></span>
-        <span class="hero-dot hero-dot--green"></span>
-        <span class="hero-titlebar-text">tidemark &mdash; obsidian plugin</span>
-      </div>
-      <div class="hero-body">
-        <h1 class="hero-title">Frontmatter<br>Variables<span class="hero-cursor" aria-hidden="true"></span></h1>
-        <p class="hero-tagline">
-          Replace <em>{{variables}}</em> with YAML frontmatter values<br>
-          on demand in your markdown notes
-        </p>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <div class="hero-stat-value">9</div>
-            <div class="hero-stat-label">Commands</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-value">12</div>
-            <div class="hero-stat-label">Settings</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-value">3</div>
-            <div class="hero-stat-label">Highlight States</div>
-          </div>
-        </div>
-        <div class="hero-buttons">
-          <a href="#getting-started" class="btn btn-primary">Get Started</a>
-          <a href="https://github.com/real-fruit-snacks/tidemark/releases" class="btn btn-ghost">Download</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ FEATURES ============ -->
-  <section id="features">
-    <span class="section-label">// capabilities</span>
-    <h2 class="section-title">Write once. Fill everywhere.</h2>
-    <p class="section-desc">
-      Define variables in YAML frontmatter, reference them with {{}} syntax, then copy or replace with a single keystroke. Every feature works with markdown files.
-    </p>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#9998;</span>
-        <h3>Variable Replacement</h3>
-        <p>Replace {{variables}} with YAML frontmatter values. Copy to clipboard or permanently replace in-document. Supports nested properties, arrays, and defaults.</p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128203;</span>
-        <h3>Quick Copy</h3>
-        <p>Copy current line, selection, or entire document with variables replaced. Paste commands straight into your terminal with values already filled in.</p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#127912;</span>
-        <h3>Syntax Highlighting</h3>
-        <p>Color-coded variables: green for existing, orange for defaults, red for missing. See variable status at a glance without running anything.</p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128269;</span>
-        <h3>Variable List</h3>
-        <p>Searchable modal shows every variable grouped by status. Edit values, navigate to locations, and identify missing variables in one view.</p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128279;</span>
-        <h3>Nested Properties</h3>
-        <p>Access nested YAML with dot notation: {{server.ip}}, {{creds.user}}. Array indexing with {{items[0]}}. Toggle nesting on or off.</p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128196;</span>
-        <h3>File Renaming</h3>
-        <p>Replace variables in filenames too. Rename files based on frontmatter values with sanitization and collision detection built in.</p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#9881;</span>
-        <h3>Configurable</h3>
-        <p>Custom delimiters, default values, case-insensitive matching, array join separators, notification levels. Every aspect is tunable.</p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#9000;</span>
-        <h3>Keyboard Shortcuts</h3>
-        <p>All commands available via Command Palette. Configure your own hotkeys in Obsidian Settings for fast access to every common operation.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ VARIABLE SYNTAX ============ -->
-  <section class="capabilities-section" id="syntax">
-    <span class="section-label">// variable syntax</span>
-    <h2 class="section-title">Simple. Powerful. Flexible.</h2>
-    <p class="section-desc" style="margin-left:auto;margin-right:auto;">
-      Variables use {{name}} syntax with support for defaults, nesting, arrays, and case-insensitive matching.
-    </p>
-
-    <div class="capabilities-terminal">
-      <div class="capabilities-titlebar">
-        <span class="hero-dot hero-dot--red"></span>
-        <span class="hero-dot hero-dot--yellow"></span>
-        <span class="hero-dot hero-dot--green"></span>
-        <span class="capabilities-titlebar-text">variable syntax reference</span>
-      </div>
-      <div class="capabilities-body">
-        <div class="capabilities-grid">
-          <div class="capability-pill"><span class="dot dot--basic"></span> {{variable}} <span class="detail">basic</span></div>
-          <div class="capability-pill"><span class="dot dot--basic"></span> {{var:default}} <span class="detail">with default</span></div>
-          <div class="capability-pill"><span class="dot dot--nested"></span> {{obj.key}} <span class="detail">nested</span></div>
-          <div class="capability-pill"><span class="dot dot--nested"></span> {{obj.deep.key}} <span class="detail">deep nested</span></div>
-          <div class="capability-pill"><span class="dot dot--format"></span> {{items[0]}} <span class="detail">array index</span></div>
-          <div class="capability-pill"><span class="dot dot--format"></span> {{ports}} <span class="detail">array join</span></div>
-          <div class="capability-pill"><span class="dot dot--config"></span> Case Insensitive <span class="detail">opt-in</span></div>
-          <div class="capability-pill"><span class="dot dot--config"></span> Custom Delimiters <span class="detail">configurable</span></div>
-          <div class="capability-pill"><span class="dot dot--config"></span> Custom Separator <span class="detail">default :</span></div>
-        </div>
-        <div class="capabilities-legend">
-          <span><span class="dot dot--basic" style="display:inline-block;width:6px;height:6px;border-radius:50%;"></span> Basic Syntax</span>
-          <span><span class="dot dot--nested" style="display:inline-block;width:6px;height:6px;border-radius:50%;"></span> Nested Access</span>
-          <span><span class="dot dot--format" style="display:inline-block;width:6px;height:6px;border-radius:50%;"></span> Arrays</span>
-          <span><span class="dot dot--config" style="display:inline-block;width:6px;height:6px;border-radius:50%;"></span> Configuration</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ COMMANDS ============ -->
-  <section id="commands">
-    <span class="section-label">// commands</span>
-    <h2 class="section-title">Copy. Replace. Control.</h2>
-    <p class="section-desc">
-      Nine commands accessible via Command Palette, keyboard shortcuts, and context menu. Every operation works on lines, selections, or full documents.
-    </p>
-
-    <div class="arch-terminal">
-      <div class="arch-titlebar">
-        <span class="hero-dot hero-dot--red"></span>
-        <span class="hero-dot hero-dot--yellow"></span>
-        <span class="hero-dot hero-dot--green"></span>
-        <span class="arch-titlebar-text">command palette &mdash; tidemark</span>
-      </div>
-      <div class="arch-body">
-        <div class="arch-grid">
-          <div class="arch-item">
-            <div class="arch-item-header">
-              <span class="arch-item-marker">&#9998;</span>
-              <h3>Copy Commands</h3>
+    <!-- ════════════════════ HERO ════════════════════ -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-logo">
+                <img src="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-dark.svg" alt="Tidemark">
             </div>
-            <p>
-              Copy current line, selection, or full document with variables replaced to clipboard. Assign a hotkey in Obsidian Settings for instant access.
-            </p>
-          </div>
 
-          <div class="arch-item">
-            <div class="arch-item-header">
-              <span class="arch-item-marker">&#8644;</span>
-              <h3>Replace Commands</h3>
+            <p class="subtitle">
+                Obsidian plugin for variable substitution in markdown.
+                Define variables in YAML frontmatter, reference with <code>{{variable}}</code> syntax,
+                copy or replace with a single command. Perfect for pentesting and templates.
+            </p>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Commands</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Highlight Colors</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">&infin;</div>
+                    <div class="stat-label">Nesting Depth</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Themes</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">External Deps</div>
+                </div>
             </div>
-            <p>
-              Permanently replace variables in selection, full document, or document and filename combined. All accessible via Command Palette.
-            </p>
-          </div>
 
-          <div class="arch-item">
-            <div class="arch-item-header">
-              <span class="arch-item-marker">&#9776;</span>
-              <h3>List Variables</h3>
+            <div class="cta-group">
+                <a href="https://github.com/Real-Fruit-Snacks/Tidemark/releases/latest" class="btn btn-primary">Download Latest</a>
+                <a href="https://github.com/Real-Fruit-Snacks/Tidemark" class="btn btn-secondary">View Source</a>
+                <a href="https://github.com/Real-Fruit-Snacks/Tidemark#quick-start" class="btn btn-ghost">Documentation</a>
             </div>
-            <p>
-              Open the searchable variable list with all variables grouped by status. Click to edit values or navigate to locations in your document.
-            </p>
-          </div>
+        </div>
+    </section>
 
-          <div class="arch-item">
-            <div class="arch-item-header">
-              <span class="arch-item-marker">&#128196;</span>
-              <h3>Set &amp; Rename</h3>
+    <!-- ════════════════════ FEATURES ════════════════════ -->
+    <section style="background: var(--mantle);">
+        <div class="container">
+            <h2>Features</h2>
+            <p class="section-desc">Variable substitution that works the way you think. Define once in frontmatter, use everywhere in your document.</p>
+
+            <div class="features">
+                <div class="feature">
+                    <h3>Variable Replacement</h3>
+                    <p>Replace <code>{{variables}}</code> with YAML frontmatter values. Copy to clipboard or permanently replace in-document. Supports nested properties, arrays, and defaults.</p>
+                </div>
+                <div class="feature">
+                    <h3>Quick Copy</h3>
+                    <p>Copy current line, selection, or entire document with variables replaced to clipboard. Paste commands with values already filled in.</p>
+                </div>
+                <div class="feature">
+                    <h3>Syntax Highlighting</h3>
+                    <p>Color-coded variables: <span style="color:var(--green);">green</span> for existing, <span style="color:var(--peach);">orange</span> for defaults, <span style="color:var(--red);">red</span> for missing. See status at a glance.</p>
+                </div>
+                <div class="feature">
+                    <h3>Nested Properties</h3>
+                    <p>Dot notation for nested YAML: <code>{{server.ip}}</code>, <code>{{credentials.user}}</code>. Array indexing with <code>{{items[0]}}</code>.</p>
+                </div>
+                <div class="feature">
+                    <h3>Variable List</h3>
+                    <p>See every variable grouped by status, edit values, and navigate to locations. Right-click any variable to set its value directly.</p>
+                </div>
+                <div class="feature">
+                    <h3>Default Values</h3>
+                    <p>Fallback values with <code>{{port:443}}</code> syntax. Missing variables show <code>[MISSING]</code> or preserve the original — your choice.</p>
+                </div>
+                <div class="feature">
+                    <h3>Custom Delimiters</h3>
+                    <p>Change <code>{{"{{"}}</code> / <code>{{"}}"}}</code> to any characters. Custom default separator. Case-insensitive matching option.</p>
+                </div>
+                <div class="feature">
+                    <h3>Array Support</h3>
+                    <p>YAML arrays automatically joined with configurable separator. <code>{{ports}}</code> becomes <code>22, 80, 443</code>.</p>
+                </div>
+                <div class="feature">
+                    <h3>File Rename</h3>
+                    <p>Replace variables in document body and filename simultaneously. Create templated files that name themselves.</p>
+                </div>
             </div>
-            <p>
-              Right-click any variable to set its value via context menu. Rename files with variables replaced &mdash; includes sanitization and collision detection.
-            </p>
-          </div>
         </div>
+    </section>
 
-        <hr class="arch-divider">
+    <!-- ════════════════════ CAPABILITIES ════════════════════ -->
+    <section>
+        <div class="container">
+            <h2>Capabilities</h2>
+            <p class="section-desc">Full variable substitution engine running inside Obsidian. Works on desktop and mobile.</p>
 
-        <div class="arch-stack">
-          <span>Copy Line (replaced)</span>
-          <span>Replace in Selection</span>
-          <span>Replace All in Document</span>
-          <span>List All Variables</span>
+            <div class="capabilities">
+                <div class="capability"><span class="cap-dot full"></span>Copy Line</div>
+                <div class="capability"><span class="cap-dot full"></span>Copy Selection</div>
+                <div class="capability"><span class="cap-dot full"></span>Copy Document</div>
+                <div class="capability"><span class="cap-dot full"></span>Replace Selection</div>
+                <div class="capability"><span class="cap-dot full"></span>Replace All</div>
+                <div class="capability"><span class="cap-dot full"></span>Rename File</div>
+                <div class="capability"><span class="cap-dot full"></span>List Variables</div>
+                <div class="capability"><span class="cap-dot full"></span>Set Variable</div>
+                <div class="capability"><span class="cap-dot full"></span>Nested Properties</div>
+                <div class="capability"><span class="cap-dot full"></span>Array Handling</div>
+                <div class="capability"><span class="cap-dot full"></span>Default Values</div>
+                <div class="capability"><span class="cap-dot full"></span>Syntax Highlight</div>
+                <div class="capability"><span class="cap-dot full"></span>Custom Delimiters</div>
+                <div class="capability"><span class="cap-dot partial"></span>Context Menu</div>
+            </div>
+
+            <div style="margin-top: 20px; font-size: 12px; color: var(--overlay0); font-family: 'JetBrains Mono', monospace;">
+                <span style="color: var(--green);">&#9679;</span> Full &nbsp;&nbsp;
+                <span style="color: var(--yellow);">&#9679;</span> Desktop Only
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ============ USE CASES ============ -->
-  <section id="use-cases">
-    <span class="section-label">// workflows</span>
-    <h2 class="section-title">Write templates. Fill values. Execute.</h2>
-    <p class="section-desc">
-      Pentesting notes, CTF writeups, project templates. Define once in frontmatter, reference everywhere in the document.
-    </p>
+    <!-- ════════════════════ ARCHITECTURE ════════════════════ -->
+    <section style="background: var(--mantle);">
+        <div class="container">
+            <h2>Architecture</h2>
+            <p class="section-desc">Clean separation between parsing, replacement, and UI. TypeScript throughout with Obsidian's plugin API.</p>
 
-    <div class="usage-grid">
-      <div class="usage-card">
-        <div class="usage-card-header">Pentesting Template</div>
-        <div class="usage-card-body">
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="yaml-key">IPAddress</span><span class="yaml-delim">:</span> <span class="yaml-val">10.10.10.1</span></div>
-          <div class="start-line"><span class="yaml-key">username</span><span class="yaml-delim">:</span> <span class="yaml-val">admin</span></div>
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="cmd">nmap -sV -sC </span><span class="var-exists">{{IPAddress}}</span></div>
-          <div class="start-line"><span class="cmd">ssh </span><span class="var-exists">{{username}}</span><span class="cmd">@</span><span class="var-exists">{{IPAddress}}</span></div>
+            <div class="arch-grid">
+                <div class="arch-card">
+                    <div class="arch-num">1</div>
+                    <h3>Frontmatter Parser</h3>
+                    <p>Extracts YAML frontmatter from the active document. Handles nested objects, arrays, and scalar values. Dot-notation resolution for deep property access.</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-num">2</div>
+                    <h3>Variable Replacer</h3>
+                    <p>Core replacement engine. Pattern matching with configurable delimiters. Default value extraction. Case-insensitive option. Array join with custom separator.</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-num">3</div>
+                    <h3>Decoration Provider</h3>
+                    <p>CodeMirror 6 decorations for syntax highlighting. Three colors by variable status. Real-time updates as you edit frontmatter values.</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-num">4</div>
+                    <h3>Command System</h3>
+                    <p>Nine commands registered with Obsidian's Command Palette. Copy, replace, rename, list, and set operations. Configurable hotkeys.</p>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="usage-card">
-        <div class="usage-card-header">CTF Notes</div>
-        <div class="usage-card-body">
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="yaml-key">url</span><span class="yaml-delim">:</span> <span class="yaml-val">http://ctf.example.com</span></div>
-          <div class="start-line"><span class="yaml-key">flag</span><span class="yaml-delim">:</span> <span class="yaml-val">CTF{not_found_yet}</span></div>
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="cmd">curl </span><span class="var-exists">{{url}}</span><span class="cmd">/robots.txt</span></div>
-          <div class="start-line"><span class="cmd">sqlmap -u "</span><span class="var-exists">{{url}}</span><span class="cmd">/login"</span></div>
-        </div>
-      </div>
-      <div class="usage-card">
-        <div class="usage-card-header">Default Values</div>
-        <div class="usage-card-body">
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="yaml-key">target</span><span class="yaml-delim">:</span></div>
-          <div class="start-line"><span class="yaml-delim">&nbsp;&nbsp;</span><span class="yaml-key">ip</span><span class="yaml-delim">:</span> <span class="yaml-val">10.10.10.1</span></div>
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="cmd">nc </span><span class="var-exists">{{target.ip}}</span> <span class="var-default">{{port:4444}}</span></div>
-          <div class="start-line"><span class="cmd">curl </span><span class="var-default">{{protocol:https}}</span><span class="cmd">://</span><span class="var-exists">{{target.ip}}</span></div>
-        </div>
-      </div>
-      <div class="usage-card">
-        <div class="usage-card-header">Project Templates</div>
-        <div class="usage-card-body">
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="yaml-key">project</span><span class="yaml-delim">:</span> <span class="yaml-val">My App</span></div>
-          <div class="start-line"><span class="yaml-key">author</span><span class="yaml-delim">:</span></div>
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="cmd"># </span><span class="var-exists">{{project}}</span></div>
-          <div class="start-line"><span class="cmd">Author: </span><span class="var-missing">{{author}}</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ============ GETTING STARTED ============ -->
-  <section id="getting-started">
-    <span class="section-label">// quickstart</span>
-    <h2 class="section-title">Productive in 30 seconds</h2>
-    <p class="section-desc">
-      Install the plugin, open a markdown note with frontmatter, and start using variables immediately.
-    </p>
+    <!-- ════════════════════ GETTING STARTED ════════════════════ -->
+    <section>
+        <div class="container">
+            <h2>Getting Started</h2>
+            <p class="section-desc">Install from Community Plugins or build from source.</p>
 
-    <div class="start-row">
-      <div class="start-terminal">
-        <div class="start-titlebar">
-          <span class="hero-dot hero-dot--red"></span>
-          <span class="hero-dot hero-dot--yellow"></span>
-          <span class="hero-dot hero-dot--green"></span>
-          <span class="start-titlebar-text">notes/target.md</span>
+            <div class="two-col">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-label">install.sh</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><span class="c"># Build from source</span>
+<span class="p">$</span> git clone https://github.com/Real-Fruit-Snacks/Tidemark.git
+<span class="p">$</span> cd Tidemark
+
+<span class="c"># Install and build</span>
+<span class="p">$</span> npm install
+<span class="p">$</span> npm run build
+
+<span class="c"># Copy to vault</span>
+<span class="p">$</span> cp main.js manifest.json styles.css \
+    /path/to/vault/.obsidian/plugins/tidemark/
+
+<span class="v">Plugin ready — enable in Obsidian settings</span><span class="cursor"></span></pre>
+                    </div>
+                </div>
+
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-label">example.md</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><span class="c">---</span>
+<span class="f">IPAddress:</span> <span class="v">10.10.10.1</span>
+<span class="f">username:</span> <span class="v">admin</span>
+<span class="f">ports:</span> <span class="v">22,80,443</span>
+<span class="c">---</span>
+
+<span class="c"># Enumeration</span>
+
+nmap -A -p- <span class="v">{{IPAddress}}</span>
+ssh <span class="v">{{username}}</span>@<span class="v">{{IPAddress}}</span>
+gobuster dir -u http://<span class="v">{{IPAddress}}</span>
+
+<span class="c"># Copy line → paste in terminal</span>
+<span class="p">$</span> nmap -A -p- <span class="v">10.10.10.1</span></pre>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="start-body">
-          <div class="start-line"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="yaml-key">IPAddress</span><span class="yaml-delim">:</span> <span class="yaml-val">10.10.10.1</span></div>
-          <div class="start-line"><span class="yaml-key">hostname</span><span class="yaml-delim">:</span> <span class="yaml-val">target</span></div>
-          <div class="start-line"><span class="yaml-key">username</span><span class="yaml-delim">:</span> <span class="yaml-val">admin</span></div>
-          <div class="start-line" style="margin-bottom:16px;"><span class="yaml-delim">---</span></div>
-          <div class="start-line"><span class="comment"># Enumeration</span></div>
-          <div class="start-line" style="margin-bottom:16px;"><span class="cmd">nmap -A -p- </span><span class="var-exists">{{IPAddress}}</span></div>
-          <div class="start-line"><span class="comment"># Use Command Palette to copy with values filled</span></div>
-          <div class="start-line"><span class="cmd">ssh </span><span class="var-exists">{{username}}</span><span class="cmd">@</span><span class="var-exists">{{hostname}}</span></div>
+    </section>
+
+    <!-- ════════════════════ FOOTER ════════════════════ -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidemark#quick-start">Quick Start</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidemark#variable-syntax">Variable Syntax</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidemark#commands">Commands</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidemark#configuration">Configuration</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidemark/releases/latest">Latest Release</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidemark/issues">Report Issue</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidemark/blob/main/CONTRIBUTING.md">Contributing</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidemark/blob/main/CHANGELOG.md">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Toolkit</h4>
+                    <ul>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Fathom">Fathom</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Flux">Flux</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Ripple">Ripple</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Sunken-Archive">Sunken-Archive</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Surge">Surge</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Tidepool">Tidepool</a></li>
+                        <li><a href="https://github.com/Real-Fruit-Snacks/Riptide">Riptide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>License</h4>
+                    <p>MIT License<br>Copyright &copy; 2026 Real-Fruit-Snacks<br><br>Built with TypeScript + Obsidian API</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                Part of the Real-Fruit-Snacks toolkit &nbsp;&middot;&nbsp; Templates that fill themselves.
+            </div>
         </div>
-      </div>
-
-      <div class="start-info">
-        <p>
-          <strong style="color:var(--ctp-text);">1. Install</strong> &mdash; Search "Tidemark" in Obsidian Settings &gt; Community Plugins &gt; Browse, and click Install.
-        </p>
-        <p>
-          <strong style="color:var(--ctp-text);">2. Write</strong> &mdash; Create a markdown file with YAML frontmatter between <code>---</code> fences. Reference values with <code>{{variable}}</code> syntax.
-        </p>
-        <p>
-          <strong style="color:var(--ctp-text);">3. Use</strong> &mdash; Open Command Palette (<code>Ctrl/Cmd+P</code>), type "Tidemark", and select "Copy current line (replaced)". Paste directly into your terminal.
-        </p>
-        <p>
-          <strong style="color:var(--ctp-text);">4. Replace</strong> &mdash; Use "Replace all in document" from Command Palette to permanently replace all variables when you're done templating.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ FOOTER ============ -->
-  <footer class="site-footer">
-    <p class="footer-tagline">Templates that fill themselves.</p>
-    <nav class="footer-links" aria-label="Footer links">
-      <a href="https://github.com/real-fruit-snacks/tidemark">GitHub</a>
-      <a href="https://github.com/real-fruit-snacks/tidemark/blob/main/LICENSE">License (MIT)</a>
-      <a href="https://github.com/real-fruit-snacks/tidemark/releases">Releases</a>
-      <a href="https://github.com/real-fruit-snacks/tidemark/issues">Report Issue</a>
-    </nav>
-    <p class="footer-copy">Tidemark &mdash; {{variables}} resolved</p>
-  </footer>
-
-</div>
+    </footer>
 
 </body>
 </html>

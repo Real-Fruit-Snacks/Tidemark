@@ -1,38 +1,22 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/banner.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/banner.svg">
-  <img alt="Tidemark" src="assets/banner.svg" width="800">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-light.svg">
+  <img alt="Tidemark" src="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-dark.svg" width="520">
 </picture>
 
-<br>
+![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Obsidian-7C3AED)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-**Replace variables in markdown with YAML frontmatter values on demand**
+**Obsidian plugin for variable substitution in markdown via YAML frontmatter**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Obsidian](https://img.shields.io/badge/Obsidian-1.0%2B-7C3AED.svg)](https://obsidian.md)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3%2B-3178C6.svg)](https://www.typescriptlang.org)
+Define variables in YAML frontmatter, reference them with `{{variable}}` syntax anywhere in your document, then copy or replace with a single command. Supports nested properties, arrays, default values, and syntax highlighting. Perfect for pentesting workflows, CTF notes, and reusable note templates.
 
-<br>
-
-Define variables in YAML frontmatter, reference them with `{{variable}}` syntax anywhere in your document, then copy or replace with a single command. Perfect for pentesting workflows, CTF notes, and reusable note templates.
+[Quick Start](#quick-start) • [Variable Syntax](#variable-syntax) • [Commands](#commands) • [Configuration](#configuration) • [Use Cases](#use-cases) • [Architecture](#architecture)
 
 </div>
-
-<br>
-
-## Table of Contents
-
-- [Highlights](#highlights)
-- [Quick Start](#quick-start)
-- [Variable Syntax](#variable-syntax)
-- [Commands](#commands)
-- [Configuration](#configuration)
-- [Use Cases](#use-cases)
-- [Syntax Highlighting](#syntax-highlighting)
-- [Tips & Tricks](#tips--tricks)
-- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -42,41 +26,25 @@ Define variables in YAML frontmatter, reference them with `{{variable}}` syntax 
 <tr>
 <td width="50%">
 
-### Variable Replacement
+**Variable Replacement**
 Replace `{{variables}}` with YAML frontmatter values on demand. Copy to clipboard or permanently replace in-document. Supports nested properties, arrays, and default values.
 
-</td>
-<td width="50%">
-
-### Quick Copy
-Copy current line, selection, or entire document with variables replaced directly to clipboard. Paste commands straight into your terminal with values already filled in.
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### Syntax Highlighting
+**Syntax Highlighting**
 Color-coded variables in the editor: green for existing values, orange for variables with defaults, red for missing. See variable status at a glance without running anything.
 
-</td>
-<td width="50%">
-
-### Variable List & Context Menu
-Use List All Variables to see every variable grouped by status, edit values, and navigate to locations. Right-click any variable to set its value directly.
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### Nested Properties
+**Nested Properties**
 Access nested YAML with dot notation: `{{server.ip}}`, `{{credentials.user}}`. Array indexing with `{{items[0]}}`. Toggle nesting on or off per your workflow.
 
 </td>
 <td width="50%">
 
-### Flexible Configuration
+**Quick Copy**
+Copy current line, selection, or entire document with variables replaced directly to clipboard. Paste commands straight into your terminal with values already filled in.
+
+**Variable List & Context Menu**
+Use List All Variables to see every variable grouped by status, edit values, and navigate to locations. Right-click any variable to set its value directly.
+
+**Flexible Configuration**
 Custom delimiters, default values, case-insensitive matching, array join separators, missing value text, notification levels. Every aspect is configurable through Obsidian settings.
 
 </td>
@@ -87,7 +55,27 @@ Custom delimiters, default values, case-insensitive matching, array join separat
 
 ## Quick Start
 
-### 1. Install the Plugin
+### Prerequisites
+
+<table>
+<tr>
+<th>Requirement</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+<tr>
+<td>Obsidian</td>
+<td>1.0+</td>
+<td>Plugin host</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td>18+</td>
+<td>Building from source (optional)</td>
+</tr>
+</table>
+
+### Install
 
 **From Community Plugins:**
 1. Open Obsidian Settings > Community Plugins
@@ -95,31 +83,36 @@ Custom delimiters, default values, case-insensitive matching, array join separat
 3. Click Install, then Enable
 
 **Manual Installation:**
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/real-fruit-snacks/tidemark/releases)
-2. Create a folder `.obsidian/plugins/tidemark/` in your vault
-3. Copy the three files into that folder
-4. Enable the plugin in Settings > Community Plugins
-
-### 2. Set Up Your Note
-
-```markdown
----
-IPAddress: 10.10.10.1
-hostname: target
-username: admin
-ports: 22,80,443
----
-
-# Enumeration
-
-nmap -A -p- {{IPAddress}}
-gobuster dir -u http://{{IPAddress}} -w /usr/share/wordlists/dirb/common.txt
-ssh {{username}}@{{hostname}}
+```bash
+# Download from latest release
+# Copy main.js, manifest.json, styles.css to .obsidian/plugins/tidemark/
 ```
 
-### 3. Use Commands
+### Build from Source
 
-Open the Command Palette (Ctrl/Cmd+P) and type "Tidemark" to see all available commands. Configure hotkeys in Settings > Hotkeys.
+```bash
+# Clone repository
+git clone https://github.com/Real-Fruit-Snacks/Tidemark.git
+cd Tidemark
+
+# Install dependencies
+npm install
+
+# Build plugin
+npm run build
+
+# Copy to vault
+cp main.js manifest.json styles.css /path/to/vault/.obsidian/plugins/tidemark/
+```
+
+### Verification
+
+```bash
+# Open Obsidian
+# Settings > Community Plugins > Enable Tidemark
+# Create a note with frontmatter variables
+# Open Command Palette > "Tidemark: Copy current line (replaced)"
+```
 
 ---
 
@@ -218,7 +211,7 @@ Access via Settings > Community Plugins > Tidemark:
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `highlightVariables` | `true` | Color-code variables in editor |
-| `highlightColors.exists` | auto | Color for set variables (hex, e.g. `#28a745`) |
+| `highlightColors.exists` | auto | Color for set variables |
 | `highlightColors.missing` | auto | Color for missing variables |
 | `highlightColors.hasDefault` | auto | Color for variables with defaults |
 
@@ -303,6 +296,44 @@ Colors adapt to light/dark themes automatically (Catppuccin Latte/Mocha). Overri
 
 ---
 
+## Architecture
+
+```
+Tidemark/
+├── package.json                      # Dependencies and scripts
+├── tsconfig.json                     # TypeScript configuration
+├── esbuild.config.mjs                # esbuild bundler config
+├── manifest.json                     # Obsidian plugin manifest
+├── styles.css                        # Plugin styles
+│
+├── src/
+│   ├── main.ts                       # Plugin entry point, command registration
+│   ├── variableReplacer.ts           # Core replacement engine
+│   ├── frontmatterParser.ts          # YAML frontmatter extraction and parsing
+│   ├── decorationProvider.ts         # CodeMirror syntax highlighting decorations
+│   ├── types.ts                      # TypeScript interfaces and types
+│   │
+│   ├── commands/                     # ── Command Handlers ──
+│   │   └── ...                       # Copy, replace, list, rename commands
+│   │
+│   └── utils/                        # ── Utilities ──
+│       └── ...                       # String helpers, YAML utilities
+│
+├── assets/                           # ── Repository Assets ──
+│   └── banner.svg                    # Project banner (Catppuccin themed)
+│
+├── docs/                             # ── GitHub Pages ──
+│   ├── index.html                    # Project website
+│   └── assets/
+│       ├── logo-dark.svg             # Logo for dark theme
+│       └── logo-light.svg            # Logo for light theme
+│
+└── .github/
+    └── workflows/                    # CI/CD pipelines
+```
+
+---
+
 ## Tips & Tricks
 
 ### Quick Command Execution
@@ -319,13 +350,6 @@ Use **List all variables** to:
 - See all variables at once
 - Quickly identify missing values
 - Edit multiple values in sequence
-
-### Template Management
-
-1. Create a "templates" folder in your vault
-2. Build reusable note templates
-3. Duplicate when starting new notes
-4. Fill in unique values via frontmatter
 
 ### Default Values Strategy
 
@@ -351,12 +375,99 @@ Use default values for common scenarios:
 
 ---
 
+## Platform Support
+
+<table>
+<tr>
+<th>Capability</th>
+<th>Desktop</th>
+<th>Mobile (iOS)</th>
+<th>Mobile (Android)</th>
+</tr>
+<tr>
+<td>Variable Replacement</td>
+<td>Full</td>
+<td>Full</td>
+<td>Full</td>
+</tr>
+<tr>
+<td>Copy to Clipboard</td>
+<td>Full</td>
+<td>Full</td>
+<td>Full</td>
+</tr>
+<tr>
+<td>Syntax Highlighting</td>
+<td>Full</td>
+<td>Full</td>
+<td>Full</td>
+</tr>
+<tr>
+<td>Context Menu</td>
+<td>Full</td>
+<td>Limited</td>
+<td>Limited</td>
+</tr>
+<tr>
+<td>Nested Properties</td>
+<td>Full</td>
+<td>Full</td>
+<td>Full</td>
+</tr>
+<tr>
+<td>File Rename</td>
+<td>Full</td>
+<td>Full</td>
+<td>Full</td>
+</tr>
+</table>
+
+---
+
+## Security
+
+### Vulnerability Reporting
+
+**Report security issues via:**
+- GitHub Security Advisories (preferred)
+- Private disclosure to maintainers
+- Responsible disclosure timeline (90 days)
+
+**Do NOT:**
+- Open public GitHub issues for vulnerabilities
+- Disclose before coordination with maintainers
+
+---
+
+## License
+
+MIT License
+
+Copyright &copy; 2026 Real-Fruit-Snacks
+
+```
+THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+THE AUTHORS ARE NOT LIABLE FOR ANY DAMAGES ARISING FROM USE.
+```
+
+---
+
+## Resources
+
+- **GitHub**: [github.com/Real-Fruit-Snacks/Tidemark](https://github.com/Real-Fruit-Snacks/Tidemark)
+- **Issues**: [Report a Bug](https://github.com/Real-Fruit-Snacks/Tidemark/issues)
+- **Security**: [SECURITY.md](SECURITY.md)
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
+
+---
+
 <div align="center">
 
-**Built for offense. Tested in labs.**
+**Part of the Real-Fruit-Snacks toolkit**
 
-[GitHub](https://github.com/real-fruit-snacks/tidemark) | [License (MIT)](LICENSE) | [Report Issue](https://github.com/real-fruit-snacks/tidemark/issues)
+[Aquifer](https://github.com/Real-Fruit-Snacks/Aquifer) • [Cascade](https://github.com/Real-Fruit-Snacks/Cascade) • [Conduit](https://github.com/Real-Fruit-Snacks/Conduit) • [Deadwater](https://github.com/Real-Fruit-Snacks/Deadwater) • [Deluge](https://github.com/Real-Fruit-Snacks/Deluge) • [Depth](https://github.com/Real-Fruit-Snacks/Depth) • [Dew](https://github.com/Real-Fruit-Snacks/Dew) • [Droplet](https://github.com/Real-Fruit-Snacks/Droplet) • [Fathom](https://github.com/Real-Fruit-Snacks/Fathom) • [Flux](https://github.com/Real-Fruit-Snacks/Flux) • [Grotto](https://github.com/Real-Fruit-Snacks/Grotto) • [HydroShot](https://github.com/Real-Fruit-Snacks/HydroShot) • [Maelstrom](https://github.com/Real-Fruit-Snacks/Maelstrom) • [Rapids](https://github.com/Real-Fruit-Snacks/Rapids) • [Ripple](https://github.com/Real-Fruit-Snacks/Ripple) • [Riptide](https://github.com/Real-Fruit-Snacks/Riptide) • [Runoff](https://github.com/Real-Fruit-Snacks/Runoff) • [Seep](https://github.com/Real-Fruit-Snacks/Seep) • [Shallows](https://github.com/Real-Fruit-Snacks/Shallows) • [Siphon](https://github.com/Real-Fruit-Snacks/Siphon) • [Slipstream](https://github.com/Real-Fruit-Snacks/Slipstream) • [Spillway](https://github.com/Real-Fruit-Snacks/Spillway) • [Sunken-Archive](https://github.com/Real-Fruit-Snacks/Sunken-Archive) • [Surge](https://github.com/Real-Fruit-Snacks/Surge) • **Tidemark** • [Tidepool](https://github.com/Real-Fruit-Snacks/Tidepool) • [Undercurrent](https://github.com/Real-Fruit-Snacks/Undercurrent)
 
-*Tidemark — templates that fill themselves*
+*Templates that fill themselves.*
 
 </div>
