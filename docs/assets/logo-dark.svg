@@ -1,99 +1,109 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" fill="none">
   <defs>
-    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Primary gradient: mauve to pink -->
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#cba6f7"/>
+      <stop offset="40%" stop-color="#cba6f7"/>
       <stop offset="100%" stop-color="#f5c2e7"/>
     </linearGradient>
-    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+
+    <!-- Accent gradient: pink to mauve -->
+    <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f5c2e7"/>
+      <stop offset="100%" stop-color="#cba6f7"/>
+    </linearGradient>
+
+    <!-- Icon gradient: vertical -->
+    <linearGradient id="g3" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#cba6f7"/>
+      <stop offset="50%" stop-color="#cba6f7"/>
       <stop offset="100%" stop-color="#f5c2e7"/>
     </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-    <filter id="softGlow">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+
+    <!-- Faint outer glow -->
+    <filter id="softglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#cba6f7" flood-opacity="0.15" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+      <feComposite in="SourceGraphic" in2="shadow" operator="over"/>
     </filter>
   </defs>
 
-  <!-- Background -->
-  <rect width="720" height="220" fill="#11111b" rx="8"/>
+  <!-- ===================== LOGOMARK ===================== -->
+  <g transform="translate(58, 40)" filter="url(#softglow)">
 
-  <!-- Hexagonal Frame -->
-  <g transform="translate(100, 110)" filter="url(#softGlow)">
-    <polygon points="0,-72 62.4,-36 62.4,36 0,72 -62.4,36 -62.4,-36"
-             fill="none" stroke="url(#accentGrad)" stroke-width="1.5" opacity="0.4"/>
+    <!-- Hexagonal frame -->
+    <path d="M 80 6 L 140 38 L 140 102 L 80 134 L 20 102 L 20 38 Z"
+          fill="none" stroke="url(#g1)" stroke-width="1.5" opacity="0.4"/>
 
-    <!-- Center node -->
-    <circle cx="0" cy="0" r="2" fill="#cba6f7" opacity="0.6"/>
-    <!-- Entry node (left) -->
-    <circle cx="-62.4" cy="0" r="2" fill="#cba6f7" opacity="0.5"/>
-    <!-- Exit node (right) -->
-    <circle cx="62.4" cy="0" r="2" fill="#cba6f7" opacity="0.5"/>
+    <!-- Inner hex subtle fill -->
+    <path d="M 80 14 L 134 42 L 134 98 L 80 126 L 26 98 L 26 42 Z"
+          fill="#cba6f7" opacity="0.04"/>
 
-    <!-- Particle dots on hex edges -->
-    <circle cx="31.2" cy="-54" r="1.2" fill="#f5c2e7" opacity="0.35"/>
-    <circle cx="-31.2" cy="-54" r="1.2" fill="#cba6f7" opacity="0.3"/>
-    <circle cx="31.2" cy="54" r="1.2" fill="#f5c2e7" opacity="0.3"/>
-    <circle cx="-31.2" cy="54" r="1.2" fill="#cba6f7" opacity="0.35"/>
-    <circle cx="-55" cy="-18" r="1" fill="#f5c2e7" opacity="0.25"/>
-    <circle cx="55" cy="18" r="1" fill="#cba6f7" opacity="0.25"/>
+    <!-- === VARIABLE MARKERS === -->
 
-    <!-- LOGOMARK: Variable Markers -->
     <!-- Horizontal baseline -->
-    <line x1="-36" y1="0" x2="36" y2="0" stroke="url(#accentGrad)" stroke-width="1.2" opacity="0.6"/>
+    <line x1="44" y1="70" x2="116" y2="70" stroke="url(#g1)" stroke-width="1.2" opacity="0.6"/>
 
     <!-- Markers above the line (flags pointing up) -->
     <!-- Flag 1 — left -->
-    <line x1="-24" y1="0" x2="-24" y2="-28" stroke="#cba6f7" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
-    <polygon points="-24,-28 -24,-18 -16,-23" fill="#cba6f7" opacity="0.5"/>
+    <line x1="56" y1="70" x2="56" y2="42" stroke="#cba6f7" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
+    <polygon points="56,42 56,52 64,47" fill="#cba6f7" opacity="0.5"/>
 
     <!-- Flag 2 — center-left -->
-    <line x1="-4" y1="0" x2="-4" y2="-22" stroke="url(#accentGrad)" stroke-width="1.2" stroke-linecap="round" opacity="0.65"/>
-    <polygon points="-4,-22 -4,-14 4,-18" fill="#f5c2e7" opacity="0.45"/>
+    <line x1="76" y1="70" x2="76" y2="48" stroke="url(#g1)" stroke-width="1.2" stroke-linecap="round" opacity="0.65"/>
+    <polygon points="76,48 76,56 84,52" fill="#f5c2e7" opacity="0.45"/>
 
     <!-- Flag 3 — right -->
-    <line x1="20" y1="0" x2="20" y2="-34" stroke="#f5c2e7" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/>
-    <polygon points="20,-34 20,-24 28,-29" fill="#cba6f7" opacity="0.5"/>
+    <line x1="100" y1="70" x2="100" y2="36" stroke="#f5c2e7" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/>
+    <polygon points="100,36 100,46 108,41" fill="#cba6f7" opacity="0.5"/>
 
     <!-- Markers below the line (flags pointing down) -->
     <!-- Flag 4 — center -->
-    <line x1="8" y1="0" x2="8" y2="20" stroke="#cba6f7" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-    <polygon points="8,20 8,12 16,16" fill="#f5c2e7" opacity="0.4"/>
+    <line x1="88" y1="70" x2="88" y2="90" stroke="#cba6f7" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+    <polygon points="88,90 88,82 96,86" fill="#f5c2e7" opacity="0.4"/>
 
     <!-- Flag 5 — left-center -->
-    <line x1="-14" y1="0" x2="-14" y2="26" stroke="url(#accentGrad)" stroke-width="1.1" stroke-linecap="round" opacity="0.55"/>
-    <polygon points="-14,26 -14,18 -6,22" fill="#cba6f7" opacity="0.4"/>
+    <line x1="66" y1="70" x2="66" y2="96" stroke="url(#g1)" stroke-width="1.1" stroke-linecap="round" opacity="0.55"/>
+    <polygon points="66,96 66,88 74,92" fill="#cba6f7" opacity="0.4"/>
 
     <!-- Small accent dots at flag tips -->
-    <circle cx="-24" cy="-28" r="1.5" fill="#cba6f7" opacity="0.6"/>
-    <circle cx="-4" cy="-22" r="1.3" fill="#f5c2e7" opacity="0.5"/>
-    <circle cx="20" cy="-34" r="1.5" fill="#f5c2e7" opacity="0.55"/>
-    <circle cx="8" cy="20" r="1.2" fill="#cba6f7" opacity="0.45"/>
-    <circle cx="-14" cy="26" r="1.2" fill="#f5c2e7" opacity="0.4"/>
+    <circle cx="56" cy="42" r="1.5" fill="#cba6f7" opacity="0.6"/>
+    <circle cx="76" cy="48" r="1.3" fill="#f5c2e7" opacity="0.5"/>
+    <circle cx="100" cy="36" r="1.5" fill="#f5c2e7" opacity="0.55"/>
+    <circle cx="88" cy="90" r="1.2" fill="#cba6f7" opacity="0.45"/>
+    <circle cx="66" cy="96" r="1.2" fill="#f5c2e7" opacity="0.4"/>
 
     <!-- Decorative substitution brackets -->
-    <text x="-34" y="-10" font-family="monospace" font-size="8" fill="#cba6f7" opacity="0.2">{</text>
-    <text x="30" y="14" font-family="monospace" font-size="8" fill="#f5c2e7" opacity="0.2">}</text>
+    <text x="46" y="60" font-family="monospace" font-size="8" fill="#cba6f7" opacity="0.2">{</text>
+    <text x="110" y="84" font-family="monospace" font-size="8" fill="#f5c2e7" opacity="0.2">}</text>
+
+    <!-- Corner accents on hex -->
+    <circle cx="80" cy="6" r="2" fill="#cba6f7" opacity="0.3"/>
+    <circle cx="80" cy="134" r="2" fill="#f5c2e7" opacity="0.3"/>
   </g>
 
-  <!-- Typography -->
-  <g transform="translate(200, 0)">
-    <!-- Project Name -->
-    <text x="0" y="92" font-family="'Inter','Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="62" font-weight="800" fill="url(#textGrad)" letter-spacing="3">TIDEMARK</text>
+  <!-- ===================== TYPOGRAPHY ===================== -->
 
-    <!-- Separator line -->
-    <line x1="0" y1="108" x2="370" y2="108" stroke="url(#accentGrad)" stroke-width="0.8" opacity="0.4"/>
+  <!-- "TIDEMARK" -->
+  <text x="415" y="108"
+        font-family="'SF Pro Display', 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        font-size="62" font-weight="800" letter-spacing="14"
+        fill="url(#g1)" text-anchor="middle">TIDEMARK</text>
 
-    <!-- Tagline -->
-    <text x="0" y="132" font-family="'JetBrains Mono','Fira Code','Cascadia Code',monospace" font-size="11.5" fill="#cdd6f4" letter-spacing="2" opacity="0.85">OBSIDIAN VARIABLE SUBSTITUTION</text>
+  <!-- Thin separator line -->
+  <line x1="280" y1="128" x2="550" y2="128"
+        stroke="url(#g1)" stroke-width="0.8" opacity="0.25"/>
 
-    <!-- Descriptor -->
-    <text x="0" y="152" font-family="'JetBrains Mono','Fira Code','Cascadia Code',monospace" font-size="9" fill="#a6adc8" letter-spacing="2.5" opacity="0.6">TYPESCRIPT · YAML · MARKDOWN</text>
-  </g>
+  <!-- Tagline -->
+  <text x="415" y="152"
+        font-family="'SF Mono', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace"
+        font-size="11.5" font-weight="400" letter-spacing="5.5"
+        fill="#7f849c" text-anchor="middle">OBSIDIAN VARIABLE SUBSTITUTION</text>
+
+  <!-- Descriptor -->
+  <text x="415" y="172"
+        font-family="'SF Mono', 'JetBrains Mono', 'Fira Code', monospace"
+        font-size="9" font-weight="400" letter-spacing="3"
+        fill="#585b70" text-anchor="middle">TYPESCRIPT  ·  YAML  ·  MARKDOWN</text>
 </svg>
