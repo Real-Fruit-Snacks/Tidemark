@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#181825"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="256" height="256" rx="48" fill="url(#bgGradient)"/>
+
+  <!-- Subtle border -->
+  <rect x="1" y="1" width="254" height="254" rx="47" fill="none" stroke="#45475a" stroke-width="1.5"/>
+
+  <!-- Document background -->
+  <rect x="50" y="40" width="156" height="176" rx="12" fill="#313244" opacity="0.6"/>
+  <rect x="52" y="42" width="152" height="172" rx="10" fill="none" stroke="#45475a" stroke-width="1.5"/>
+
+  <!-- Frontmatter area -->
+  <rect x="52" y="42" width="152" height="56" rx="10" fill="#313244" opacity="0.5"/>
+
+  <!-- Frontmatter dashes -->
+  <line x1="70" y1="58" x2="105" y2="58" stroke="#6c7086" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- YAML key-value lines -->
+  <rect x="70" y="72" width="50" height="5" rx="2.5" fill="#89b4fa" opacity="0.6"/>
+  <rect x="125" y="72" width="55" height="5" rx="2.5" fill="#a6e3a1" opacity="0.6"/>
+
+  <rect x="70" y="84" width="40" height="5" rx="2.5" fill="#89b4fa" opacity="0.6"/>
+  <rect x="115" y="84" width="65" height="5" rx="2.5" fill="#a6e3a1" opacity="0.6"/>
+
+  <!-- Closing frontmatter dashes -->
+  <line x1="70" y1="96" x2="105" y2="96" stroke="#6c7086" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Variable pill: exists (green) -->
+  <rect x="65" y="120" width="126" height="28" rx="6" fill="#a6e3a1" opacity="0.2"/>
+  <rect x="65" y="120" width="126" height="28" rx="6" fill="none" stroke="#a6e3a1" stroke-width="1" opacity="0.5"/>
+
+  <!-- Variable pill: has-default (yellow) -->
+  <rect x="65" y="156" width="126" height="28" rx="6" fill="#f9e2af" opacity="0.2"/>
+  <rect x="65" y="156" width="126" height="28" rx="6" fill="none" stroke="#f9e2af" stroke-width="1" opacity="0.5"/>
+
+  <!-- Variable pill: missing (red) -->
+  <rect x="65" y="192" width="126" height="28" rx="6" fill="#f38ba8" opacity="0.2"/>
+  <rect x="65" y="192" width="126" height="28" rx="6" fill="none" stroke="#f38ba8" stroke-width="1" opacity="0.5"/>
+
+  <!-- Arrow circle -->
+  <circle cx="200" cy="168" r="24" fill="#313244" opacity="0.95"/>
+  <circle cx="200" cy="168" r="23" fill="none" stroke="#45475a" stroke-width="1.5"/>
+
+  <!-- Arrow -->
+  <path d="M 191 168 L 205 168 M 201 163 L 206 168 L 201 173" stroke="#cba6f7" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Variable text labels -->
+  <g font-family="monospace" font-size="20" font-weight="bold">
+    <text x="78" y="141" fill="#a6e3a1">{{var}}</text>
+    <text x="78" y="177" fill="#f9e2af">{{opt}}</text>
+    <text x="78" y="213" fill="#f38ba8">{{new}}</text>
+  </g>
+</svg>
