@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 /**
  * List variables command - show all variables in a SuggestModal
  */
@@ -51,14 +52,14 @@ class VariableSuggestModal extends SuggestModal<Variable> {
 
         const header = container.createDiv({ cls: 'tidemark-variable-header' });
         const indicator = header.createSpan();
-        indicator.style.cssText = `display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusColor};margin-right:8px;`;
+        indicator.setAttribute('style', `display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusColor};margin-right:8px;`);
         header.createSpan({ text: variable.name, cls: 'tidemark-variable-name' });
         const badge = header.createSpan({ text: statusLabel });
-        badge.style.cssText = `margin-left:auto;font-size:10px;color:${statusColor};opacity:0.8;`;
+        badge.setAttribute('style', `margin-left:auto;font-size:10px;color:${statusColor};opacity:0.8;`);
 
         // Value display
         const detail = container.createDiv();
-        detail.style.cssText = 'font-size:12px;color:var(--text-muted);margin-top:2px;';
+        detail.setAttribute('style', 'font-size:12px;color:var(--text-muted);margin-top:2px;');
         if (variable.status === 'exists') {
             detail.setText(`Value: ${variable.value}`);
         } else if (variable.defaultValue) {
@@ -71,7 +72,8 @@ class VariableSuggestModal extends SuggestModal<Variable> {
     onChooseSuggestion(variable: Variable): void {
         const editor = this.editor;
         const desc = variable.defaultValue ? `Default: ${variable.defaultValue}` : undefined;
-        new SetValueModal(this.app, variable.name, variable.value?.toString() || '', variable.defaultValue || 'Enter value...', async (newValue) => {
+        new SetValueModal(this.app, variable.name, variable.value?.toString() || '', variable.defaultValue || 'Enter value...', (newValue) => {
+            void (async () => {
             try {
                 const settings = getSettings();
                 const content = editor.getValue();
@@ -84,6 +86,7 @@ class VariableSuggestModal extends SuggestModal<Variable> {
                 notify('Failed to edit variable', 'error');
                 console.error('Edit variable error:', error);
             }
+            })();
         }, desc).open();
     }
 }

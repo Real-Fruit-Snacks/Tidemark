@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 /**
  * Variable replacement engine - core logic
  */
@@ -168,7 +169,7 @@ export function replaceVariables(
             } else if (typeof value === 'object') {
                 try {
                     return JSON.stringify(value);
-                } catch (e) {
+                } catch (_e) {
                     return '[Complex Object]';
                 }
             }

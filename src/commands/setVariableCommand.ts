@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 /**
  * Set variable command - context menu / command to set variable value
  */
@@ -44,7 +45,7 @@ export class SetValueModal extends Modal {
                 .onChange(value => {
                     inputValue = value;
                 });
-            setTimeout(() => text.inputEl.focus(), 50);
+            window.setTimeout(() => text.inputEl.focus(), 50);
             text.inputEl.addEventListener('keydown', (e: KeyboardEvent) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();

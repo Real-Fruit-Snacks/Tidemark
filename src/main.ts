@@ -113,7 +113,7 @@ export default class TidemarkPlugin extends Plugin {
             name: 'List all variables',
             editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
                 const view = getMarkdownView(ctx);
-                if (view) listVariablesCommand(this.app, editor, view);
+                if (view) void listVariablesCommand(this.app, editor, view);
             },
         });
 
@@ -122,7 +122,7 @@ export default class TidemarkPlugin extends Plugin {
             name: 'Set variable value',
             editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
                 const view = getMarkdownView(ctx);
-                if (view) setVariableCommand(this.app, editor, view);
+                if (view) void setVariableCommand(this.app, editor, view);
             },
         });
 
@@ -134,7 +134,7 @@ export default class TidemarkPlugin extends Plugin {
                     item.setTitle('Tidemark: Set variable value')
                         .setIcon('pencil')
                         .onClick(() => {
-                            setVariableCommand(this.app, editor, view);
+                            void setVariableCommand(this.app, editor, view);
                         });
                 });
             })

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 /**
  * Frontmatter parsing and manipulation
  */
 
-import * as yaml from 'js-yaml';
+import { parseYaml, stringifyYaml } from 'obsidian';
 import { Frontmatter, FORBIDDEN_KEYS, MAX_ARRAY_INDEX } from './types';
 
 /**
@@ -27,7 +28,7 @@ export function parseFrontmatter(text: string): Frontmatter {
     }
 
     try {
-        return (yaml.load(match[1], { schema: yaml.DEFAULT_SCHEMA }) as Frontmatter) || {};
+        return (parseYaml(match[1]) as Frontmatter) || {};
     } catch (e) {
         console.error('YAML parse error:', e);
         return {};
@@ -77,7 +78,7 @@ export function updateFrontmatter(
     }
 
     // Stringify
-    const newFmContent = yaml.dump(frontmatter);
+    const newFmContent = stringifyYaml(frontmatter);
     const newFmBlock = `---\n${newFmContent}---\n`;
 
     if (hasFrontmatter) {

@@ -2,7 +2,7 @@
   "name": "tidemark",
   "displayName": "Tidemark",
   "description": "Replace variables in markdown with YAML frontmatter values on demand. Perfect for pentesting notes, CTF templates, and reusable note structures.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "Real-Fruit-Snacks",
   "author": "Real-Fruit-Snacks",
   "scripts": {
@@ -12,11 +12,9 @@
     "test": "echo \"No tests yet\" && exit 0"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
     "@types/node": "20.x",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
-    "builtin-modules": "^4.0.0",
     "esbuild": "^0.24.0",
     "eslint": "^8.56.0",
     "obsidian": "latest",
@@ -24,7 +22,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "@codemirror/view": "*",
+    "@codemirror/state": "*"
   },
   "repository": {
     "type": "git",
