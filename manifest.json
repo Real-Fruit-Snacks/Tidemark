@@ -1,9 +1,9 @@
 {
   "id": "tidemark",
   "name": "Tidemark",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minAppVersion": "1.0.0",
-  "description": "Replace {{variables}} with YAML frontmatter values on demand",
+  "description": "Replace {{variables}} with YAML frontmatter values on demand.",
   "author": "Real-Fruit-Snacks",
   "authorUrl": "https://github.com/Real-Fruit-Snacks",
   "isDesktopOnly": false

@@ -2,7 +2,7 @@
   "name": "tidemark",
   "displayName": "Tidemark",
   "description": "Replace variables in markdown with YAML frontmatter values on demand. Perfect for pentesting notes, CTF templates, and reusable note structures.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "Real-Fruit-Snacks",
   "author": "Real-Fruit-Snacks",
   "scripts": {
@@ -33,6 +33,5 @@
   "bugs": {
     "url": "https://github.com/real-fruit-snacks/tidemark/issues"
   },
-  "license": "MIT",
-  "author": "Real-Fruit-Snacks"
+  "license": "MIT"
 }
