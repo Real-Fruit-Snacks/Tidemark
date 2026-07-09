@@ -199,7 +199,7 @@ export class TidemarkSettingTab extends PluginSettingTab {
             .setName('Color: exists')
             .setDesc('Color for variables with values in frontmatter (empty = default green). Use hex like #28a745')
             .addText(text => text
-                .setPlaceholder('#a6e3a1')
+                .setPlaceholder('#63f2ab')
                 .setValue(currentSettings.highlightColors.exists)
                 .onChange(async (value) => {
                     await saveSettings({
@@ -211,7 +211,7 @@ export class TidemarkSettingTab extends PluginSettingTab {
             .setName('Color: missing')
             .setDesc('Color for variables without values or defaults (empty = default red). Use hex like #dc3545')
             .addText(text => text
-                .setPlaceholder('#f38ba8')
+                .setPlaceholder('#ff6e7a')
                 .setValue(currentSettings.highlightColors.missing)
                 .onChange(async (value) => {
                     await saveSettings({
@@ -223,7 +223,7 @@ export class TidemarkSettingTab extends PluginSettingTab {
             .setName('Color: has default')
             .setDesc('Color for variables with default values (empty = default orange). Use hex like #e6a700')
             .addText(text => text
-                .setPlaceholder('#f9e2af')
+                .setPlaceholder('#f0c674')
                 .setValue(currentSettings.highlightColors.hasDefault)
                 .onChange(async (value) => {
                     await saveSettings({

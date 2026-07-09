@@ -79,11 +79,11 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     }
 };
 
-// Default colors for variable state highlighting (Catppuccin Latte/Mocha)
+// Default colors for variable state highlighting (Terminal Workbench)
 export const DEFAULT_HIGHLIGHT_COLORS = {
-    exists: { light: '#40a02b', dark: '#a6e3a1' },
-    missing: { light: '#d20f39', dark: '#f38ba8' },
-    hasDefault: { light: '#df8e1d', dark: '#f9e2af' }
+    exists: { light: '#007a4d', dark: '#63f2ab' },
+    missing: { light: '#c8324c', dark: '#ff6e7a' },
+    hasDefault: { light: '#a46600', dark: '#f0c674' }
 };
 
 // Forbidden keys to prevent prototype pollution
