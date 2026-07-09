@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="Tidemark — variable substitution for Obsidian">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e1214"/><stop offset="1" stop-color="#13191c"/></linearGradient>
+    <linearGradient id="tileB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#13191c"/><stop offset="1" stop-color="#182024"/></linearGradient>
+    <clipPath id="tb"><rect x="574" y="96" width="132" height="132" rx="30"/></clipPath>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect x="24" y="24" width="1232" height="592" rx="14" fill="none" stroke="#2a363d"/>
+  <g clip-path="url(#tb)">
+    <rect x="574" y="96" width="132" height="132" fill="url(#tileB)"/>
+    <rect x="574" y="166" width="132" height="62" fill="#63f2ab" opacity="0.06"/>
+    <text x="618" y="192" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="76" font-weight="600" fill="#b4c3bd">{</text>
+    <text x="662" y="192" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="76" font-weight="600" fill="#b4c3bd">}</text>
+    <line x1="606" y1="166" x2="674" y2="166" stroke="#63f2ab" stroke-width="9" opacity="0.14"/>
+    <line x1="606" y1="166" x2="674" y2="166" stroke="#63f2ab" stroke-width="3.5"/>
+  </g>
+  <rect x="574" y="96" width="132" height="132" rx="30" fill="none" stroke="#2a363d" stroke-width="2"/>
+  <text x="640" y="352" text-anchor="middle" font-family="Inter,'Segoe UI',system-ui,sans-serif" font-size="128" font-weight="800" letter-spacing="-4" fill="#dce4df">Tidemark</text>
+  <line x1="360" y1="392" x2="920" y2="392" stroke="#63f2ab" stroke-width="10" opacity="0.13"/>
+  <line x1="360" y1="392" x2="920" y2="392" stroke="#63f2ab" stroke-width="2.5"/>
+  <text x="640" y="452" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="30"><tspan fill="#63f2ab">{{host}}</tspan><tspan fill="#63736f"> &#8594; </tspan><tspan fill="#dce4df">prod-db-01</tspan></text>
+  <text x="640" y="556" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="15" letter-spacing="3" fill="#63736f">TEMPLATE VARIABLES, RESOLVED FROM YAML FRONTMATTER &#183; OBSIDIAN PLUGIN</text>
+</svg>
