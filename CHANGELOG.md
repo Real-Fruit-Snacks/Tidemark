@@ -2,6 +2,12 @@
 
 All notable changes to the Tidemark plugin will be documented in this file.
 
+## [1.0.4]
+
+### Changed
+- Rebranded onto the Terminal Workbench design system. Default variable highlight colors are now mint (resolved), amber (has default), and red (missing); the light-mode variants darken for contrast. Custom colors set in settings are unaffected.
+- New README, logo, icon, and documentation site.
+
 ## [1.0.3]
 
 ### Fixed
