@@ -188,7 +188,7 @@ export class TidemarkSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Highlight variables')
-            .setDesc('Color-code variables in the editor: green (exists), orange (has default), red (missing)')
+            .setDesc('Color-code variables in the editor: mint (exists), amber (has default), red (missing)')
             .addToggle(toggle => toggle
                 .setValue(currentSettings.highlightVariables)
                 .onChange(async (value) => {

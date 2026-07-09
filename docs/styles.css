@@ -62,7 +62,6 @@ code { font-family: var(--twb-font-mono); font-size: 0.9em; color: var(--twb-tex
 .tok--ok { color: var(--twb-accent); background: var(--twb-tag-bg); }
 .tok--def { color: var(--twb-warm); background: color-mix(in srgb, var(--twb-warm) 13%, transparent); }
 .tok--miss { color: var(--twb-red); background: color-mix(in srgb, var(--twb-red) 13%, transparent); }
-.arrow { color: var(--twb-text-faint); }
 
 /* Sections */
 .section { padding: 56px 0; }
