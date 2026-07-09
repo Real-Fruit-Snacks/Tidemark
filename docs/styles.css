@@ -31,7 +31,6 @@ code { font-family: var(--twb-font-mono); font-size: 0.9em; color: var(--twb-tex
 /* Hero */
 .hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center;
   max-width: 1080px; margin: 0 auto; padding: 72px 24px 56px; }
-.hero-logo { max-width: 460px; width: 100%; height: auto; }
 .hero-badge { display: inline-flex; align-items: center; gap: 8px; margin: 22px 0 18px;
   background: var(--twb-nav-active); border: 1px solid var(--twb-tag-border); color: var(--twb-text-soft);
   border-radius: var(--twb-radius-pill); padding: 5px 12px; }
