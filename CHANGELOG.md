@@ -2,6 +2,14 @@
 
 All notable changes to the Tidemark plugin will be documented in this file.
 
+## [1.0.5]
+
+### Changed
+- Code-quality pass to meet the Obsidian community plugin guidelines: replaced `any` with precise types and removed blanket lint suppressions, settings section headings now use the standard `setHeading()` API, editor decorations read the active document for popout-window compatibility, and command promises are handled explicitly. No behavior changes.
+
+### Added
+- Release assets are now published with GitHub artifact attestations so their provenance can be cryptographically verified.
+
 ## [1.0.4]
 
 ### Changed
