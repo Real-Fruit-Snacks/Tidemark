@@ -4,7 +4,7 @@
  */
 
 import { App, Editor, MarkdownView, Modal, Setting } from 'obsidian';
-import { parseFrontmatter, updateFrontmatter } from '../frontmatterParser';
+import { parseFrontmatter, buildFrontmatterBlock } from '../frontmatterParser';
 import { getVariableAtPosition, getNestedValue } from '../variableReplacer';
 import { getSettings } from '../utils/settings';
 import { notify } from '../utils/notifications';
@@ -101,13 +101,13 @@ export function setVariableCommand(app: App, editor: Editor, _view: MarkdownView
             (newValue) => {
                 try {
                     const latestContent = editor.getValue();
-                    const newText = updateFrontmatter(latestContent, {
+                    const { block, end } = buildFrontmatterBlock(latestContent, {
                         [variable.name]: newValue
                     }, settings.supportNestedProperties);
-                    editor.setValue(newText);
+                    editor.replaceRange(block, { line: 0, ch: 0 }, editor.offsetToPos(end));
                     notify(`Set ${variable.name} = ${newValue}`);
                 } catch (error) {
-                    notify('Failed to set variable value', 'error');
+                    notify(error instanceof Error ? error.message : 'Failed to set variable value', 'error');
                     console.error('Set variable error:', error);
                 }
             }

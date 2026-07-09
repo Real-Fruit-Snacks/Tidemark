@@ -3,13 +3,13 @@
  * Variable replacement engine - core logic
  */
 
-import { Frontmatter, ReplacementResult, PluginSettings, Variable, FORBIDDEN_KEYS } from './types';
+import { Frontmatter, ReplacementResult, PluginSettings, Variable, VariableEdit, VariableEditResult, FORBIDDEN_KEYS } from './types';
 
 // Cached regex pattern for performance
 let patternCache: { key: string; pattern: RegExp } | null = null;
 
 // Maximum document size for regex operations (ReDoS mitigation)
-const MAX_DOCUMENT_SIZE = 1_000_000; // 1MB
+export const MAX_DOCUMENT_SIZE = 1_000_000; // 1MB
 
 /**
  * Escape special regex characters
@@ -226,6 +226,71 @@ export function getVariableAtPosition(
     }
     
     return null;
+}
+
+/**
+ * Compute the replacement text for a scanned variable, mirroring the logic in
+ * replaceVariables. Returns null when the variable should be left untouched
+ * (missing variable with "preserve original on missing" enabled).
+ */
+export function replacementForVariable(variable: Variable, settings: PluginSettings): string | null {
+    if (variable.status === 'exists') {
+        const value = variable.value;
+        if (Array.isArray(value)) {
+            return value.join(settings.arrayJoinSeparator || ', ');
+        }
+        if (value !== null && typeof value === 'object') {
+            try {
+                return JSON.stringify(value);
+            } catch (_e) {
+                return '[Complex Object]';
+            }
+        }
+        return String(value);
+    }
+
+    if (variable.status === 'has-default') {
+        return variable.defaultValue ?? '';
+    }
+
+    // Missing
+    return settings.preserveOriginalOnMissing ? null : settings.missingValueText;
+}
+
+/**
+ * Turn scanned variables into a set of targeted editor edits (one per variable)
+ * so callers can apply a single transaction instead of rewriting the whole
+ * document. Positions come straight from scanDocumentVariables.
+ */
+export function buildVariableEdits(variables: Variable[], settings: PluginSettings): VariableEditResult {
+    const edits: VariableEdit[] = [];
+    let replaced = 0;
+    let missing = 0;
+
+    for (const variable of variables) {
+        if (variable.status === 'missing') {
+            missing++;
+        } else {
+            replaced++;
+        }
+
+        if (!variable.position) {
+            continue;
+        }
+
+        const text = replacementForVariable(variable, settings);
+        if (text === null || text === variable.fullMatch) {
+            continue;
+        }
+
+        edits.push({
+            from: { line: variable.position.line, ch: variable.position.start },
+            to: { line: variable.position.line, ch: variable.position.end },
+            text,
+        });
+    }
+
+    return { edits, replaced, missing };
 }
 
 /**

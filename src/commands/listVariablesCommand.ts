@@ -4,7 +4,7 @@
  */
 
 import { App, Editor, MarkdownView, SuggestModal } from 'obsidian';
-import { parseFrontmatter, findFrontmatterEnd, updateFrontmatter } from '../frontmatterParser';
+import { parseFrontmatter, findFrontmatterEnd, buildFrontmatterBlock } from '../frontmatterParser';
 import { scanDocumentVariables } from '../variableReplacer';
 import { getSettings } from '../utils/settings';
 import { notify } from '../utils/notifications';
@@ -73,20 +73,18 @@ class VariableSuggestModal extends SuggestModal<Variable> {
         const editor = this.editor;
         const desc = variable.defaultValue ? `Default: ${variable.defaultValue}` : undefined;
         new SetValueModal(this.app, variable.name, variable.value?.toString() || '', variable.defaultValue || 'Enter value...', (newValue) => {
-            void (async () => {
             try {
                 const settings = getSettings();
                 const content = editor.getValue();
-                const newText = updateFrontmatter(content, {
+                const { block, end } = buildFrontmatterBlock(content, {
                     [variable.name]: newValue
                 }, settings.supportNestedProperties);
-                editor.setValue(newText);
+                editor.replaceRange(block, { line: 0, ch: 0 }, editor.offsetToPos(end));
                 notify(`Updated ${variable.name} = ${newValue}`);
             } catch (error) {
-                notify('Failed to edit variable', 'error');
+                notify(error instanceof Error ? error.message : 'Failed to edit variable', 'error');
                 console.error('Edit variable error:', error);
             }
-            })();
         }, desc).open();
     }
 }

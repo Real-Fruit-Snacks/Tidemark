@@ -1,7 +1,7 @@
 {
   "id": "tidemark",
   "name": "Tidemark",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "minAppVersion": "1.0.0",
   "description": "Replace {{variables}} with YAML frontmatter values on demand.",
   "author": "Real-Fruit-Snacks",

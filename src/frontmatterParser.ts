@@ -60,35 +60,66 @@ export function findFrontmatterEnd(text: string): number {
 }
 
 /**
- * Update frontmatter with new values
- * Returns new full document text with updated frontmatter
+ * Result of a strict frontmatter parse that distinguishes "no frontmatter"
+ * from "frontmatter present but unusable" so callers can fail closed.
  */
-export function updateFrontmatter(
+export type FrontmatterParseResult =
+    | { ok: true; data: Frontmatter }
+    | { ok: false; reason: string };
+
+/**
+ * Parse frontmatter, reporting failure instead of silently returning {}.
+ * A document with no frontmatter is a success with empty data; a document
+ * with a broken or unclosed frontmatter block is a failure.
+ */
+export function parseFrontmatterStrict(text: string): FrontmatterParseResult {
+    if (!text.startsWith('---')) {
+        return { ok: true, data: {} };
+    }
+
+    const emptyMatch = text.match(/^---\r?\n---(?:\r?\n|$)/);
+    if (emptyMatch) {
+        return { ok: true, data: {} };
+    }
+
+    const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+    if (!match) {
+        return { ok: false, reason: 'Cannot update frontmatter: the block is not closed with an ending ---' };
+    }
+
+    try {
+        return { ok: true, data: (parseYaml(match[1]) as Frontmatter) || {} };
+    } catch (e) {
+        console.error('YAML parse error:', e);
+        return { ok: false, reason: 'Cannot update frontmatter: it is not valid YAML' };
+    }
+}
+
+/**
+ * Build a replacement frontmatter block with the given updates applied.
+ * Throws if the existing frontmatter cannot be parsed, so callers never
+ * overwrite an unreadable block with a partial one. The returned `end` is
+ * the offset in the original text where the old block ends (0 when the
+ * document has no frontmatter yet).
+ */
+export function buildFrontmatterBlock(
     text: string,
     updates: Record<string, any>,
     supportNestedProperties: boolean = true
-): string {
-    const hasFrontmatter = text.startsWith('---');
+): { block: string; end: number } {
+    const parsed = parseFrontmatterStrict(text);
+    if (!parsed.ok) {
+        throw new Error(parsed.reason);
+    }
 
-    const frontmatter = parseFrontmatter(text);
-
-    // Apply updates
+    const frontmatter = parsed.data;
     for (const [key, value] of Object.entries(updates)) {
         setNestedValue(frontmatter, key, value, supportNestedProperties);
     }
 
-    // Stringify
-    const newFmContent = stringifyYaml(frontmatter);
-    const newFmBlock = `---\n${newFmContent}---\n`;
-
-    if (hasFrontmatter) {
-        // Replace existing
-        const fmEnd = findFrontmatterEnd(text);
-        return newFmBlock + text.slice(fmEnd);
-    } else {
-        // Insert new
-        return newFmBlock + text;
-    }
+    const block = `---\n${stringifyYaml(frontmatter)}---\n`;
+    const end = text.startsWith('---') ? findFrontmatterEnd(text) : 0;
+    return { block, end };
 }
 
 /**

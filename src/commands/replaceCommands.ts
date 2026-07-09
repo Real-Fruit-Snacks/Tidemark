@@ -4,7 +4,7 @@
 
 import { App, Editor, MarkdownView } from 'obsidian';
 import { parseFrontmatter, findFrontmatterEnd } from '../frontmatterParser';
-import { replaceVariables } from '../variableReplacer';
+import { replaceVariables, scanDocumentVariables, buildVariableEdits, MAX_DOCUMENT_SIZE } from '../variableReplacer';
 import { getSettings } from '../utils/settings';
 import { notify } from '../utils/notifications';
 import { sanitizeFilename } from '../utils/fileOperations';
@@ -58,35 +58,30 @@ export function replaceInDocument(editor: Editor, _view: MarkdownView): void {
     try {
         const settings = getSettings();
         const content = editor.getValue();
+
+        if (content.length > MAX_DOCUMENT_SIZE) {
+            notify('Document too large to process (over 1,000,000 characters)', 'error');
+            return;
+        }
+
         const frontmatter = parseFrontmatter(content);
-
-        // Find the end of frontmatter to avoid replacing in YAML
         const frontmatterEnd = findFrontmatterEnd(content);
-        const bodyPart = content.slice(frontmatterEnd);
-
-        const { result, replacementCount, missingCount } = replaceVariables(bodyPart, frontmatter, settings);
+        const variables = scanDocumentVariables(content, frontmatter, frontmatterEnd, settings);
 
         // Skip if nothing to replace
-        if (replacementCount === 0 && missingCount === 0) {
+        if (variables.length === 0) {
             notify('No variables found in document', 'info');
             return;
         }
 
-        // Save cursor position
-        const cursor = editor.getCursor();
+        // Apply targeted edits in a single transaction so the cursor, scroll
+        // position, and undo history are preserved.
+        const { edits, replaced, missing } = buildVariableEdits(variables, settings);
+        if (edits.length > 0) {
+            editor.transaction({ changes: edits });
+        }
 
-        // Replace only the body part (after frontmatter)
-        const newContent = content.slice(0, frontmatterEnd) + result;
-        editor.setValue(newContent);
-
-        // Restore cursor position (clamped to valid range)
-        const lastLine = editor.lastLine();
-        const newLine = Math.min(cursor.line, lastLine);
-        const lineLength = editor.getLine(newLine).length;
-        const newChar = Math.min(cursor.ch, lineLength);
-        editor.setCursor({ line: newLine, ch: newChar });
-
-        notify(`Replaced ${replacementCount} variable(s)${missingCount > 0 ? `, ${missingCount} not found` : ''}`);
+        notify(`Replaced ${replaced} variable(s)${missing > 0 ? `, ${missing} not found` : ''}`);
     } catch (error) {
         notify('Failed to replace variables', 'error');
         console.error('Replace in document error:', error);
@@ -100,12 +95,18 @@ export async function replaceInDocumentAndFilename(app: App, editor: Editor, vie
     try {
         const settings = getSettings();
         const content = editor.getValue();
+
+        if (content.length > MAX_DOCUMENT_SIZE) {
+            notify('Document too large to process (over 1,000,000 characters)', 'error');
+            return;
+        }
+
         const frontmatter = parseFrontmatter(content);
 
-        // Calculate document replacements
+        // Calculate document replacements as targeted edits
         const frontmatterEnd = findFrontmatterEnd(content);
-        const bodyPart = content.slice(frontmatterEnd);
-        const docResult = replaceVariables(bodyPart, frontmatter, settings);
+        const variables = scanDocumentVariables(content, frontmatter, frontmatterEnd, settings);
+        const docEdits = buildVariableEdits(variables, settings);
 
         // Calculate filename replacements
         const file = view.file;
@@ -121,7 +122,7 @@ export async function replaceInDocumentAndFilename(app: App, editor: Editor, vie
         let newFilename = '';
 
         // Check if there's anything to do
-        const hasDocChanges = docResult.replacementCount > 0 || docResult.missingCount > 0;
+        const hasDocChanges = variables.length > 0;
         const hasFilenameChanges = filenameResult.replacementCount > 0 && filenameResult.result !== currentName;
 
         if (!hasDocChanges && !hasFilenameChanges) {
@@ -158,31 +159,22 @@ export async function replaceInDocumentAndFilename(app: App, editor: Editor, vie
             }
         }
 
-        // THEN MODIFY DOCUMENT
-        if (hasDocChanges) {
-            const cursor = editor.getCursor();
-            const newContent = content.slice(0, frontmatterEnd) + docResult.result;
-            editor.setValue(newContent);
-
-            // Restore cursor
-            const lastLine = editor.lastLine();
-            const newLine = Math.min(cursor.line, lastLine);
-            const lineLength = editor.getLine(newLine).length;
-            const newChar = Math.min(cursor.ch, lineLength);
-            editor.setCursor({ line: newLine, ch: newChar });
+        // THEN MODIFY DOCUMENT with a single targeted transaction
+        if (hasDocChanges && docEdits.edits.length > 0) {
+            editor.transaction({ changes: docEdits.edits });
         }
 
         // Build notification message
         let msg = '';
-        if (docResult.replacementCount > 0) {
-            msg += `Replaced ${docResult.replacementCount} in document`;
+        if (docEdits.replaced > 0) {
+            msg += `Replaced ${docEdits.replaced} in document`;
         }
         if (filenameReplaced) {
             msg += msg ? ', ' : '';
             msg += `renamed to: ${newFilename}`;
         }
-        if (docResult.missingCount > 0) {
-            msg += ` (${docResult.missingCount} not found)`;
+        if (docEdits.missing > 0) {
+            msg += ` (${docEdits.missing} not found)`;
         }
 
         if (msg) {

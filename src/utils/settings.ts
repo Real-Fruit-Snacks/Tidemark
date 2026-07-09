@@ -3,7 +3,7 @@
  * Settings management for Obsidian plugin
  */
 
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
 import type TidemarkPlugin from '../main';
 import { PluginSettings, DEFAULT_SETTINGS } from '../types';
 
@@ -54,7 +54,12 @@ export async function saveSettings(updates: SettingsUpdate): Promise<void> {
     }
     Object.assign(currentSettings, updates);
     if (pluginInstance) {
-        await pluginInstance.saveData(currentSettings);
+        try {
+            await pluginInstance.saveData(currentSettings);
+        } catch (e) {
+            console.error('Failed to save Tidemark settings:', e);
+            new Notice('Failed to save Tidemark settings', 8000);
+        }
     }
     if (settingsChangeCallback) {
         settingsChangeCallback();

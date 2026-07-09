@@ -44,6 +44,23 @@ export interface ReplacementResult {
     missingCount: number;
 }
 
+export interface EditorPositionLike {
+    line: number;
+    ch: number;
+}
+
+export interface VariableEdit {
+    from: EditorPositionLike;
+    to: EditorPositionLike;
+    text: string;
+}
+
+export interface VariableEditResult {
+    edits: VariableEdit[];
+    replaced: number;
+    missing: number;
+}
+
 export const DEFAULT_SETTINGS: PluginSettings = {
     openDelimiter: '{{',
     closeDelimiter: '}}',
