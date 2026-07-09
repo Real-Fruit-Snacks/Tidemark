@@ -1,25 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" fill="none">
-  <rect x="0" y="0" width="800" height="200" fill="#ffffff"/>
-  <line x1="0" y1="32" x2="800" y2="32" stroke="#bcc0cc" stroke-width="1"/>
-  <text x="20" y="22" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="10" font-weight="700" fill="#8839ef" letter-spacing="2">RFS</text>
-  <text x="60" y="22" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="10" font-weight="500" fill="#9ca0b0" letter-spacing="2">·  TIDEMARK  ·  OBSIDIAN VARIABLE PLUGIN</text>
-  <circle cx="664" cy="18" r="3" fill="#fe640b"/>
-  <text x="780" y="22" text-anchor="end" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="10" font-weight="500" fill="#6c6f85" letter-spacing="2">YAML · {{template}}</text>
-  <text x="20" y="115" font-family="'Inter', sans-serif" font-size="92" font-weight="800" fill="#1e1e2e" letter-spacing="-4">TIDEMARK<tspan fill="#df8e1d">.</tspan></text>
-  <line x1="0" y1="140" x2="800" y2="140" stroke="#bcc0cc" stroke-width="1"/>
-  <line x1="200" y1="140" x2="200" y2="200" stroke="#bcc0cc" stroke-width="1"/>
-  <line x1="400" y1="140" x2="400" y2="200" stroke="#bcc0cc" stroke-width="1"/>
-  <line x1="600" y1="140" x2="600" y2="200" stroke="#bcc0cc" stroke-width="1"/>
-  <text x="20" y="158" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="10" font-weight="600" fill="#9ca0b0" letter-spacing="1">SYNTAX</text>
-  <text x="20" y="175" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="700" fill="#df8e1d" letter-spacing="0">{{var}}</text>
-  <text x="20" y="190" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="8" fill="#9ca0b0" letter-spacing="0">DEFAULTS · YAML FRONTMATTER</text>
-  <text x="220" y="158" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="10" font-weight="600" fill="#9ca0b0" letter-spacing="1">COMMANDS</text>
-  <text x="220" y="175" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="700" fill="#df8e1d" letter-spacing="0">9 PALETTE</text>
-  <text x="220" y="190" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="8" fill="#9ca0b0" letter-spacing="0">INSERT · REPLACE · TOGGLE</text>
-  <text x="420" y="158" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="10" font-weight="600" fill="#9ca0b0" letter-spacing="1">TYPES</text>
-  <text x="420" y="175" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="700" fill="#df8e1d" letter-spacing="0">NESTED</text>
-  <text x="420" y="190" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="8" fill="#9ca0b0" letter-spacing="0">ARRAYS · OBJECTS · DOT-PATH</text>
-  <text x="620" y="158" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="10" font-weight="600" fill="#9ca0b0" letter-spacing="1">STACK</text>
-  <text x="620" y="175" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="700" fill="#df8e1d" letter-spacing="0">TYPESCRIPT</text>
-  <text x="620" y="190" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="8" fill="#9ca0b0" letter-spacing="0">ESBUILD · OBSIDIAN API</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" role="img" aria-label="Tidemark">
+  <defs>
+    <linearGradient id="tileL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2eae5"/><stop offset="1" stop-color="#d6e1db"/></linearGradient>
+    <clipPath id="tileClipL"><rect x="28" y="32" width="136" height="136" rx="30"/></clipPath>
+  </defs>
+  <rect x="2" y="2" width="716" height="196" rx="8" fill="#edf2ee" stroke="#bfcbc5"/>
+  <g clip-path="url(#tileClipL)">
+    <rect x="28" y="32" width="136" height="136" fill="url(#tileL)"/>
+    <rect x="28" y="104" width="136" height="64" fill="#007a4d" opacity="0.09"/>
+    <text x="74" y="132" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="78" font-weight="600" fill="#34443f">{</text>
+    <text x="120" y="132" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="78" font-weight="600" fill="#34443f">}</text>
+    <line x1="60" y1="104" x2="132" y2="104" stroke="#007a4d" stroke-width="3.5"/>
+  </g>
+  <rect x="28" y="32" width="136" height="136" rx="30" fill="none" stroke="#bfcbc5" stroke-width="2"/>
+  <text x="196" y="98" font-family="Inter,'Segoe UI',system-ui,sans-serif" font-size="60" font-weight="800" letter-spacing="-2" fill="#17201d">Tidemark</text>
+  <line x1="200" y1="120" x2="470" y2="120" stroke="#007a4d" stroke-width="2"/>
+  <text x="200" y="150" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="17"><tspan fill="#007a4d">{{host}}</tspan><tspan fill="#81918a"> &#8594; </tspan><tspan fill="#17201d">prod-db-01</tspan></text>
+  <text x="200" y="174" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="9.5" letter-spacing="1.5" fill="#81918a">TEMPLATE VARIABLES, RESOLVED FROM YAML FRONTMATTER</text>
+  <g font-family="'JetBrains Mono',ui-monospace,monospace" font-size="10.5" letter-spacing="1">
+    <circle cx="556" cy="70" r="4" fill="#007a4d"/><text x="568" y="74" fill="#60706a">RESOLVED</text>
+    <circle cx="556" cy="98" r="4" fill="#a46600"/><text x="568" y="102" fill="#60706a">DEFAULT</text>
+    <circle cx="556" cy="126" r="4" fill="#c8324c"/><text x="568" y="130" fill="#60706a">MISSING</text>
+  </g>
 </svg>
