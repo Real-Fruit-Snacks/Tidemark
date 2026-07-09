@@ -36,7 +36,6 @@ class VariableSuggestModal extends SuggestModal<Variable> {
     renderSuggestion(variable: Variable, el: HTMLElement): void {
         const container = el.createDiv({ cls: 'tidemark-variable-item' });
 
-        // Status indicator — use theme-aware colors from settings/defaults
         let statusColor: string;
         let statusLabel: string;
         if (variable.status === 'exists') {
@@ -51,15 +50,13 @@ class VariableSuggestModal extends SuggestModal<Variable> {
         }
 
         const header = container.createDiv({ cls: 'tidemark-variable-header' });
-        const indicator = header.createSpan();
-        indicator.setAttribute('style', `display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusColor};margin-right:8px;`);
+        const dot = header.createSpan({ cls: 'tidemark-variable-dot' });
+        dot.style.background = statusColor;
         header.createSpan({ text: variable.name, cls: 'tidemark-variable-name' });
-        const badge = header.createSpan({ text: statusLabel });
-        badge.setAttribute('style', `margin-left:auto;font-size:10px;color:${statusColor};opacity:0.8;`);
+        const badge = header.createSpan({ text: statusLabel, cls: 'tidemark-variable-badge' });
+        badge.style.color = statusColor;
 
-        // Value display
-        const detail = container.createDiv();
-        detail.setAttribute('style', 'font-size:12px;color:var(--text-muted);margin-top:2px;');
+        const detail = container.createDiv({ cls: 'tidemark-variable-detail' });
         if (variable.status === 'exists') {
             detail.setText(`Value: ${variable.value}`);
         } else if (variable.defaultValue) {
