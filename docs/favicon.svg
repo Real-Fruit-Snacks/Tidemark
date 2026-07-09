@@ -1,20 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#89b4fa;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#cba6f7;stop-opacity:1" />
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="15" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-  </defs>
-  <!-- Sleek dark background with rounded corners -->
-  <rect width="512" height="512" rx="120" fill="#1e1e2e" />
-  
-  <!-- Geometric diamond with modern gradient and subtle glow -->
-  <path d="M150 256 L256 150 L362 256 L256 362 Z" fill="url(#grad)" filter="url(#glow)" />
-  
-  <!-- Center cutout to give it a tech/hardware feel -->
-  <circle cx="256" cy="256" r="40" fill="#1e1e2e" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Tidemark">
+  <defs><clipPath id="f"><rect x="6" y="6" width="116" height="116" rx="22"/></clipPath></defs>
+  <g clip-path="url(#f)">
+    <rect x="6" y="6" width="116" height="116" fill="#161d20"/>
+    <text x="44" y="92" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="72" font-weight="600" fill="#b4c3bd">{</text>
+    <text x="84" y="92" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="72" font-weight="600" fill="#b4c3bd">}</text>
+    <line x1="30" y1="66" x2="98" y2="66" stroke="#63f2ab" stroke-width="12" opacity="0.14"/>
+    <line x1="30" y1="66" x2="98" y2="66" stroke="#63f2ab" stroke-width="5"/>
+  </g>
+  <rect x="6" y="6" width="116" height="116" rx="22" fill="none" stroke="#2a363d" stroke-width="2"/>
 </svg>
