@@ -1,10 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 /**
  * Frontmatter parsing and manipulation
  */
 
 import { parseYaml, stringifyYaml } from 'obsidian';
 import { Frontmatter, FORBIDDEN_KEYS, MAX_ARRAY_INDEX } from './types';
+
+/**
+ * Coerce an unknown YAML parse result into a Frontmatter object.
+ * Non-object results (scalars, arrays, null) become an empty object.
+ */
+function asFrontmatter(parsed: unknown): Frontmatter {
+    return parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)
+        ? (parsed as Frontmatter)
+        : {};
+}
 
 /**
  * Parse frontmatter from document text
@@ -28,7 +37,7 @@ export function parseFrontmatter(text: string): Frontmatter {
     }
 
     try {
-        return (parseYaml(match[1]) as Frontmatter) || {};
+        return asFrontmatter(parseYaml(match[1]) as unknown);
     } catch (e) {
         console.error('YAML parse error:', e);
         return {};
@@ -88,7 +97,7 @@ export function parseFrontmatterStrict(text: string): FrontmatterParseResult {
     }
 
     try {
-        return { ok: true, data: (parseYaml(match[1]) as Frontmatter) || {} };
+        return { ok: true, data: asFrontmatter(parseYaml(match[1]) as unknown) };
     } catch (e) {
         console.error('YAML parse error:', e);
         return { ok: false, reason: 'Cannot update frontmatter: it is not valid YAML' };
@@ -104,7 +113,7 @@ export function parseFrontmatterStrict(text: string): FrontmatterParseResult {
  */
 export function buildFrontmatterBlock(
     text: string,
-    updates: Record<string, any>,
+    updates: Record<string, unknown>,
     supportNestedProperties: boolean = true
 ): { block: string; end: number } {
     const parsed = parseFrontmatterStrict(text);
@@ -125,7 +134,7 @@ export function buildFrontmatterBlock(
 /**
  * Set a nested value in an object (handles dot notation and arrays)
  */
-export function setNestedValue(obj: any, path: string, value: any, supportNestedProperties: boolean = true): void {
+export function setNestedValue(obj: Record<string, unknown>, path: string, value: unknown, supportNestedProperties: boolean = true): void {
     // When nested properties are disabled, do a direct key assignment
     if (!supportNestedProperties) {
         if (FORBIDDEN_KEYS.has(path.toLowerCase())) {
@@ -136,7 +145,7 @@ export function setNestedValue(obj: any, path: string, value: any, supportNested
     }
 
     const keys = path.split('.');
-    let current = obj;
+    let current: Record<string, unknown> = obj;
 
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
@@ -160,6 +169,7 @@ export function setNestedValue(obj: any, path: string, value: any, supportNested
             if (!(propName in current) || !Array.isArray(current[propName])) {
                 current[propName] = [];
             }
+            const arr = current[propName] as unknown[];
 
             // Bounds check
             if (index > MAX_ARRAY_INDEX) {
@@ -168,16 +178,16 @@ export function setNestedValue(obj: any, path: string, value: any, supportNested
             }
 
             // Ensure array is long enough
-            while (current[propName].length <= index) {
-                current[propName].push({});
+            while (arr.length <= index) {
+                arr.push({});
             }
 
             // Ensure element is an object if we need to traverse deeper
-            if (current[propName][index] === null || typeof current[propName][index] !== 'object') {
-                current[propName][index] = {};
+            if (arr[index] === null || typeof arr[index] !== 'object') {
+                arr[index] = {};
             }
 
-            current = current[propName][index];
+            current = arr[index] as Record<string, unknown>;
         } else {
             // Regular property
             if (!(key in current)) {
@@ -185,7 +195,7 @@ export function setNestedValue(obj: any, path: string, value: any, supportNested
             } else if (typeof current[key] !== 'object' || current[key] === null) {
                 current[key] = {};
             }
-            current = current[key];
+            current = current[key] as Record<string, unknown>;
         }
     }
 
@@ -211,6 +221,7 @@ export function setNestedValue(obj: any, path: string, value: any, supportNested
         if (!(propName in current) || !Array.isArray(current[propName])) {
             current[propName] = [];
         }
+        const arr = current[propName] as unknown[];
 
         // Bounds check
         if (index > MAX_ARRAY_INDEX) {
@@ -219,11 +230,11 @@ export function setNestedValue(obj: any, path: string, value: any, supportNested
         }
 
         // Ensure array is long enough
-        while (current[propName].length <= index) {
-            current[propName].push(null);
+        while (arr.length <= index) {
+            arr.push(null);
         }
 
-        current[propName][index] = value;
+        arr[index] = value;
     } else {
         // Simple assignment
         current[finalKey] = value;

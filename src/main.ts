@@ -47,7 +47,7 @@ export default class TidemarkPlugin extends Plugin {
             name: 'Copy current line (replaced)',
             editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
                 const view = getMarkdownView(ctx);
-                if (view) copyLineReplaced(editor, view);
+                if (view) void copyLineReplaced(editor, view);
             },
         });
 
@@ -56,7 +56,7 @@ export default class TidemarkPlugin extends Plugin {
             name: 'Copy selection (replaced)',
             editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
                 const view = getMarkdownView(ctx);
-                if (view) copySelectionReplaced(editor, view);
+                if (view) void copySelectionReplaced(editor, view);
             },
         });
 
@@ -65,7 +65,7 @@ export default class TidemarkPlugin extends Plugin {
             name: 'Copy document (replaced)',
             editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
                 const view = getMarkdownView(ctx);
-                if (view) copyDocumentReplaced(editor, view);
+                if (view) void copyDocumentReplaced(editor, view);
             },
         });
 
@@ -93,7 +93,7 @@ export default class TidemarkPlugin extends Plugin {
             name: 'Replace in document and filename',
             editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
                 const view = getMarkdownView(ctx);
-                if (view) replaceInDocumentAndFilename(this.app, editor, view);
+                if (view) void replaceInDocumentAndFilename(this.app, editor, view);
             },
         });
 
@@ -103,7 +103,7 @@ export default class TidemarkPlugin extends Plugin {
             name: 'Rename file (replace variables)',
             editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
                 const view = getMarkdownView(ctx);
-                if (view) renameFileWithVariables(this.app, editor, view);
+                if (view) void renameFileWithVariables(this.app, editor, view);
             },
         });
 

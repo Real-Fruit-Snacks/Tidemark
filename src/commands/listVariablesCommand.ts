@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 /**
  * List variables command - show all variables in a SuggestModal
  */
@@ -58,7 +57,7 @@ class VariableSuggestModal extends SuggestModal<Variable> {
 
         const detail = container.createDiv({ cls: 'tidemark-variable-detail' });
         if (variable.status === 'exists') {
-            detail.setText(`Value: ${variable.value}`);
+            detail.setText(`Value: ${String(variable.value)}`);
         } else if (variable.defaultValue) {
             detail.setText(`Default: ${variable.defaultValue}`);
         } else {
@@ -69,7 +68,7 @@ class VariableSuggestModal extends SuggestModal<Variable> {
     onChooseSuggestion(variable: Variable): void {
         const editor = this.editor;
         const desc = variable.defaultValue ? `Default: ${variable.defaultValue}` : undefined;
-        new SetValueModal(this.app, variable.name, variable.value?.toString() || '', variable.defaultValue || 'Enter value...', (newValue) => {
+        new SetValueModal(this.app, variable.name, variable.value != null ? String(variable.value) : '', variable.defaultValue || 'Enter value...', (newValue) => {
             try {
                 const settings = getSettings();
                 const content = editor.getValue();

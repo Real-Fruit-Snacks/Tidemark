@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Type definitions for Tidemark
  */
@@ -23,7 +22,7 @@ export interface PluginSettings {
 
 export interface Variable {
     name: string;
-    value: any;
+    value: unknown;
     defaultValue?: string;
     status: 'exists' | 'missing' | 'has-default' | 'frontmatter-only';
     position?: {
@@ -35,7 +34,7 @@ export interface Variable {
 }
 
 export interface Frontmatter {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export interface ReplacementResult {

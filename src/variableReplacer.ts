@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 /**
  * Variable replacement engine - core logic
  */
@@ -63,38 +62,40 @@ export function invalidatePatternCache(): void {
 /**
  * Find a key in an object, optionally case-insensitive
  */
-export function findKey(obj: any, key: string, caseInsensitive: boolean): string | undefined {
+export function findKey(obj: unknown, key: string, caseInsensitive: boolean): string | undefined {
     if (!obj || typeof obj !== 'object') {
         return undefined;
     }
-    
+
     // Guard against prototype pollution
     if (FORBIDDEN_KEYS.has(key.toLowerCase())) {
         return undefined;
     }
-    
+
+    const record = obj as Record<string, unknown>;
+
     // Try exact match first
-    if (key in obj) {
+    if (key in record) {
         return key;
     }
-    
+
     // If case-insensitive, search for matching key
     if (caseInsensitive) {
         const lowerKey = key.toLowerCase();
-        for (const k of Object.keys(obj)) {
+        for (const k of Object.keys(record)) {
             if (k.toLowerCase() === lowerKey) {
                 return k;
             }
         }
     }
-    
+
     return undefined;
 }
 
 /**
  * Get nested property value using dot notation
  */
-export function getNestedValue(obj: any, path: string, caseInsensitive: boolean = false, supportNestedProperties: boolean = true): any {
+export function getNestedValue(obj: unknown, path: string, caseInsensitive: boolean = false, supportNestedProperties: boolean = true): unknown {
     if (!obj) {
         return undefined;
     }
@@ -102,17 +103,17 @@ export function getNestedValue(obj: any, path: string, caseInsensitive: boolean 
     // When nested properties are disabled, do a direct key lookup
     if (!supportNestedProperties) {
         const foundKey = findKey(obj, path, caseInsensitive);
-        return foundKey !== undefined ? obj[foundKey] : undefined;
+        return foundKey !== undefined ? (obj as Record<string, unknown>)[foundKey] : undefined;
     }
 
     const keys = path.split('.');
-    let value = obj;
-    
+    let value: unknown = obj;
+
     for (const key of keys) {
         if (value === undefined || value === null) {
             return undefined;
         }
-        
+
         // Handle array index notation like "items[0]"
         const arrayMatch = key.match(/^(\w+)\[(\d+)\]$/);
         if (arrayMatch) {
@@ -121,9 +122,9 @@ export function getNestedValue(obj: any, path: string, caseInsensitive: boolean 
             if (!foundKey) {
                 return undefined;
             }
-            value = value[foundKey];
-            if (Array.isArray(value)) {
-                value = value[parseInt(arrayMatch[2])];
+            const nested = (value as Record<string, unknown>)[foundKey];
+            if (Array.isArray(nested)) {
+                value = nested[parseInt(arrayMatch[2])];
             } else {
                 return undefined;
             }
@@ -132,10 +133,10 @@ export function getNestedValue(obj: any, path: string, caseInsensitive: boolean 
             if (!foundKey) {
                 return undefined;
             }
-            value = value[foundKey];
+            value = (value as Record<string, unknown>)[foundKey];
         }
     }
-    
+
     return value;
 }
 
@@ -157,9 +158,9 @@ export function replaceVariables(
     let replacementCount = 0;
     let missingCount = 0;
     
-    const result = text.replace(pattern, (match, varName, defaultValue) => {
+    const result = text.replace(pattern, (match: string, varName: string, defaultValue: string | undefined) => {
         const value = getNestedValue(frontmatter, varName.trim(), settings.caseInsensitive, settings.supportNestedProperties);
-        
+
         // Treat empty strings as missing (don't replace with nothing)
         if (value !== undefined && value !== null && value !== '') {
             replacementCount++;
@@ -169,7 +170,7 @@ export function replaceVariables(
             } else if (typeof value === 'object') {
                 try {
                     return JSON.stringify(value);
-                } catch (_e) {
+                } catch {
                     return '[Complex Object]';
                 }
             }
@@ -200,8 +201,8 @@ export function getVariableAtPosition(
 ): Variable | null {
     const pattern = getVariablePattern(settings);
     pattern.lastIndex = 0; // Reset for loop reuse
-    
-    let match;
+
+    let match: RegExpExecArray | null;
     while ((match = pattern.exec(line)) !== null) {
         const start = match.index;
         const end = start + match[0].length;
@@ -242,7 +243,7 @@ export function replacementForVariable(variable: Variable, settings: PluginSetti
         if (value !== null && typeof value === 'object') {
             try {
                 return JSON.stringify(value);
-            } catch (_e) {
+            } catch {
                 return '[Complex Object]';
             }
         }
@@ -311,11 +312,11 @@ export function scanDocumentVariables(
     const pattern = getVariablePattern(settings);
     pattern.lastIndex = 0;
     const variables: Variable[] = [];
-    
+
     // Calculate line offset for frontmatter
     const frontmatterLines = text.slice(0, frontmatterEnd).split('\n').length - 1;
-    
-    let match;
+
+    let match: RegExpExecArray | null;
     while ((match = pattern.exec(bodyPart)) !== null) {
         const varName = match[1].trim();
         const defaultValue = match[2];

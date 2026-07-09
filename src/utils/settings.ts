@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 /**
  * Settings management for Obsidian plugin
  */
@@ -14,15 +13,18 @@ let settingsChangeCallback: (() => void) | null = null;
 /**
  * Initialize settings from plugin's saved data
  */
-export function initSettings(plugin: TidemarkPlugin, loadedData: any): void {
+export function initSettings(plugin: TidemarkPlugin, loadedData: unknown): void {
     pluginInstance = plugin;
-    currentSettings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
+    const data: Partial<PluginSettings> = (loadedData && typeof loadedData === 'object')
+        ? loadedData as Partial<PluginSettings>
+        : {};
+    currentSettings = Object.assign({}, DEFAULT_SETTINGS, data);
     // Ensure nested highlightColors is merged properly
-    if (loadedData?.highlightColors) {
+    if (data.highlightColors) {
         currentSettings.highlightColors = Object.assign(
             {},
             DEFAULT_SETTINGS.highlightColors,
-            loadedData.highlightColors
+            data.highlightColors
         );
     }
 }
@@ -89,7 +91,7 @@ export class TidemarkSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         // --- Delimiters ---
-        containerEl.createEl('h3', { text: 'Delimiters' });
+        new Setting(containerEl).setName('Delimiters').setHeading();
 
         new Setting(containerEl)
             .setName('Open delimiter')
@@ -122,7 +124,7 @@ export class TidemarkSettingTab extends PluginSettingTab {
                 }));
 
         // --- Behavior ---
-        containerEl.createEl('h3', { text: 'Behavior' });
+        new Setting(containerEl).setName('Behavior').setHeading();
 
         new Setting(containerEl)
             .setName('Missing value text')
@@ -184,7 +186,7 @@ export class TidemarkSettingTab extends PluginSettingTab {
                 }));
 
         // --- Visual ---
-        containerEl.createEl('h3', { text: 'Visual' });
+        new Setting(containerEl).setName('Visual').setHeading();
 
         new Setting(containerEl)
             .setName('Highlight variables')

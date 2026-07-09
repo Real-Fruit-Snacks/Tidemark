@@ -42,7 +42,7 @@ export function getColor(state: 'exists' | 'missing' | 'hasDefault'): string {
     if (typeof custom === 'string' && HEX_COLOR.test(custom.trim())) {
         return custom.trim();
     }
-    const isDark = document.body.classList.contains('theme-dark');
+    const isDark = activeDocument.body.classList.contains('theme-dark');
     return DEFAULT_HIGHLIGHT_COLORS[state][isDark ? 'dark' : 'light'];
 }
 
@@ -102,7 +102,10 @@ class TidemarkViewPlugin implements PluginValue {
             if (isFenceLine(line.text)) {
                 let data: Frontmatter = {};
                 try {
-                    data = (parseYaml(doc.sliceString(openTo + 1, line.from)) as Frontmatter) || {};
+                    const parsed: unknown = parseYaml(doc.sliceString(openTo + 1, line.from));
+                    if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                        data = parsed as Frontmatter;
+                    }
                 } catch (e) {
                     console.error('YAML parse error:', e);
                     data = {};

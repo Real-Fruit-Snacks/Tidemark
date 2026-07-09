@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 /**
  * Set variable command - context menu / command to set variable value
  */
@@ -96,7 +95,7 @@ export function setVariableCommand(app: App, editor: Editor, _view: MarkdownView
         new SetValueModal(
             app,
             variable.name,
-            currentValue?.toString() || '',
+            currentValue != null ? String(currentValue) : '',
             'Enter value...',
             (newValue) => {
                 try {
