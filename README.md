@@ -1,13 +1,17 @@
 <div align="center">
 
-  # Tidemark
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg" />
+    <img alt="Tidemark" src="docs/assets/logo-light.svg" width="480" />
+  </picture>
 
-  **Obsidian plugin for variable substitution in markdown via YAML frontmatter.**
+  **Replace `{{variables}}` in your Obsidian notes with values from YAML frontmatter — color-coded in the editor, resolved on demand.**
 
-  [![License: MIT](https://img.shields.io/badge/License-MIT-cba6f7.svg)](LICENSE)
-  [![Version](https://img.shields.io/badge/version-1.0.0-89b4fa)](https://github.com/Real-Fruit-Snacks/Tidemark/releases)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-63f2ab.svg)](LICENSE)
+  [![Latest release](https://img.shields.io/github/v/release/Real-Fruit-Snacks/Tidemark?color=6bdcff&label=release)](https://github.com/Real-Fruit-Snacks/Tidemark/releases)
+  [![Obsidian](https://img.shields.io/badge/Obsidian-1.0%2B-f0c674.svg)](https://obsidian.md)
 
-  [Report Issue](https://github.com/Real-Fruit-Snacks/Tidemark/issues)
+  [Documentation](https://real-fruit-snacks.github.io/Tidemark/) · [Changelog](CHANGELOG.md) · [Report an issue](https://github.com/Real-Fruit-Snacks/Tidemark/issues)
 
 </div>
 
@@ -15,88 +19,71 @@
 
 ## Overview
 
-Tidemark is a **variable-substitution plugin for Obsidian**. Define variables in YAML frontmatter, reference them with `{{variable}}` syntax anywhere in your document, then copy or replace with a single command. Variables are color-coded in the editor so you can see at a glance which ones are defined, which fall back to defaults, and which are missing.
+Tidemark is a variable-substitution plugin for Obsidian. Define values once in a note's YAML frontmatter, reference them anywhere in the body with `{{variable}}` syntax, and copy or replace them with a single command. Every token is color-coded live in the editor — mint when it resolves, amber when it falls back to a default, red when it's missing — so you can see the state of a template at a glance.
 
-The core engine parses YAML frontmatter, resolves nested dot-notation and joined arrays, and emits CodeMirror decorations for real-time syntax highlighting.
+The engine parses frontmatter, resolves nested dot-notation and joined arrays, and emits CodeMirror decorations for real-time highlighting. Frontmatter is only ever read for substitution and written through Obsidian's own APIs, so your YAML stays valid.
 
----
+## Features
 
-## Key Features
+- **Color-coded states** — resolved, has-default, and missing tokens are tinted as you type.
+- **Nested & arrays** — `{{server.ip}}`, `{{items[0]}}`, and arrays joined by a configurable separator.
+- **Inline defaults** — `{{port:22}}` uses the default when the key isn't set.
+- **Copy or replace** — line, selection, or whole document, with variables resolved.
+- **Rename from variables** — resolve variables in the filename via Obsidian's file manager.
+- **Set values in place** — a command and editor-menu item to set a variable's frontmatter value from the cursor.
+- **List variables** — a searchable modal of every variable in the document and its state.
+- **Custom delimiters** — swap `{{ }}` and the default separator for your own.
 
-- **Mustache-Style Syntax**: Use `{{variable}}`, `{{variable:default}}`, and `{{nested.path}}` to reference frontmatter values.
-- **9 Palette Commands**: Copy or permanently replace variables by line, selection, or entire document.
-- **Live Syntax Highlighting**: CodeMirror decorations color-code variables by status (Green = set, Orange = default fallback, Red = missing).
-- **Nested Properties & Arrays**: Supports dot-notation for nested YAML structures and automatic array joining.
-- **Configurable Delimiters**: Customize open/close delimiters, default separators, and missing-value text.
-- **Cross-Platform**: Full support on Desktop, iOS, and Android.
+## Syntax
 
----
+| Form | Meaning |
+| --- | --- |
+| `{{name}}` | Resolve `name` from frontmatter |
+| `{{name:fallback}}` | Use `fallback` if `name` is missing |
+| `{{server.ip}}` | Nested dot-notation |
+| `{{items[0]}}` | Array index |
 
-## Getting Started / Installation
+## Installation
 
-### Community Plugins (Recommended)
+**Requires Obsidian 1.0 or newer.**
 
-1. Open Obsidian Settings and navigate to Community Plugins.
-2. Browse and search for "Tidemark".
-3. Install and Enable.
+### Community plugins (recommended)
 
-### Build from Source
+1. Open **Settings → Community plugins → Browse**.
+2. Search for **Tidemark**, then **Install** and **Enable**.
 
-Prerequisites: **Node.js 18+**
+### BRAT (latest pre-release)
 
-```bash
-git clone https://github.com/Real-Fruit-Snacks/Tidemark.git
-cd Tidemark
-npm install
-npm run build
+Install [BRAT](https://github.com/TfTHacker/obsidian42-brat), then add `Real-Fruit-Snacks/Tidemark` as a beta plugin.
 
-cp main.js manifest.json styles.css /path/to/vault/.obsidian/plugins/tidemark/
-```
+### Manual
 
----
+Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/Real-Fruit-Snacks/Tidemark/releases/latest) into `<your-vault>/.obsidian/plugins/tidemark/`, then enable Tidemark under **Settings → Community plugins**.
 
-## Usage
+## Commands
 
-1. Add YAML frontmatter to any note with your desired variables.
-2. Reference them in the document body using `{{variable}}` syntax.
-3. Open the Command Palette (`Ctrl/Cmd+P`) and search for "Tidemark" to access all available commands:
-   - **Copy current line (replaced)**: Copy the line at cursor with variables filled in.
-   - **Copy selection (replaced)**: Copy the selected text with variables filled in.
-   - **Copy document (replaced)**: Copy the entire note with variables filled in.
-   - **Replace in selection**: Permanently substitute variables in the selected text.
-   - **Replace all in document**: Replace all variables throughout the document body.
-   - **List all variables**: View and edit all variables organized by status.
+| Command | Description |
+| --- | --- |
+| Copy current line (replaced) | Copy the cursor's line with variables resolved |
+| Copy selection (replaced) | Copy the selection with variables resolved |
+| Copy document (replaced) | Copy the whole document with variables resolved |
+| Replace in selection | Replace variables in the selection (or line) in place |
+| Replace all in document | Replace every variable in the document body |
+| Replace in document and filename | Replace in the body and rename the file |
+| Rename file (replace variables) | Resolve variables in the filename only |
+| List all variables | Open a searchable list of variables and their state |
+| Set variable value | Set the frontmatter value for the variable at the cursor |
 
----
+A **Tidemark: Set variable value** item is also added to the editor right-click menu.
 
-## Architecture / File Structure
+## How it works
 
-```
-Tidemark/
-├── src/
-│   ├── main.ts                    Plugin entry and command registration
-│   ├── variableReplacer.ts        Core replacement engine
-│   ├── frontmatterParser.ts       YAML frontmatter extraction
-│   ├── decorationProvider.ts      CodeMirror syntax highlighting
-│   ├── types.ts                   TypeScript interfaces
-│   ├── commands/                  Command handlers
-│   └── utils/                     String helpers and YAML utilities
-├── manifest.json                  Obsidian plugin manifest
-├── esbuild.config.mjs             Build configuration
-├── styles.css                     Plugin styles
-└── docs/                          GitHub Pages site
-```
-
-Variable resolution is a pure function of `(text, frontmatter, settings)` with no external mutable state. The highlight decorations reflect the same resolver, so what you see in the editor is exactly what you get on copy or replace.
-
----
+Values live in the note's frontmatter; `{{variables}}` in the body reference them. Tidemark reads the frontmatter from the live editor buffer (so unsaved edits count), resolves each token, and colors it by state. Copy commands leave the document untouched; replace commands apply targeted edits; and setting a value writes only the frontmatter block — never overwriting invalid YAML.
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to help improve the project. Be sure to also review our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
-
----
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+Released under the [MIT License](LICENSE).
