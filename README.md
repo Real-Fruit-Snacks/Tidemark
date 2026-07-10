@@ -11,7 +11,7 @@
   [![Latest release](https://img.shields.io/github/v/release/Real-Fruit-Snacks/Tidemark?color=6bdcff&label=release)](https://github.com/Real-Fruit-Snacks/Tidemark/releases)
   [![Obsidian](https://img.shields.io/badge/Obsidian-1.0%2B-f0c674.svg)](https://obsidian.md)
 
-  [Documentation](https://real-fruit-snacks.github.io/Tidemark/) · [Changelog](CHANGELOG.md) · [Report an issue](https://github.com/Real-Fruit-Snacks/Tidemark/issues)
+  [Install](https://obsidian.md/plugins?id=tidemark) · [Documentation](https://real-fruit-snacks.github.io/Tidemark/) · [Changelog](CHANGELOG.md) · [Report an issue](https://github.com/Real-Fruit-Snacks/Tidemark/issues)
 
 </div>
 
@@ -51,6 +51,8 @@ The engine parses frontmatter, resolves nested dot-notation and joined arrays, a
 
 1. Open **Settings → Community plugins → Browse**.
 2. Search for **Tidemark**, then **Install** and **Enable**.
+
+Or open it straight from [obsidian.md/plugins?id=tidemark](https://obsidian.md/plugins?id=tidemark).
 
 ### BRAT (latest pre-release)
 
