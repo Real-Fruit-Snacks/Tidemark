@@ -5,11 +5,9 @@
   </defs>
   <g clip-path="url(#clip)">
     <rect x="12" y="12" width="488" height="488" fill="url(#tile)"/>
-    <rect x="12" y="276" width="488" height="224" fill="#63f2ab" opacity="0.06"/>
-    <text x="168" y="356" text-anchor="middle" font-family="'JetBrains Mono','Berkeley Mono',ui-monospace,monospace" font-size="280" font-weight="600" fill="#b4c3bd">{</text>
-    <text x="344" y="356" text-anchor="middle" font-family="'JetBrains Mono','Berkeley Mono',ui-monospace,monospace" font-size="280" font-weight="600" fill="#b4c3bd">}</text>
-    <line x1="128" y1="276" x2="384" y2="276" stroke="#63f2ab" stroke-width="32" opacity="0.14"/>
-    <line x1="128" y1="276" x2="384" y2="276" stroke="#63f2ab" stroke-width="13"/>
+    <path d="M116,205 q35,-48 70,0 t70,0 t70,0 t70,0" fill="none" stroke="#63f2ab" stroke-width="38" opacity="0.14" stroke-linecap="round"/><path d="M116,205 q35,-48 70,0 t70,0 t70,0 t70,0" fill="none" stroke="#63f2ab" stroke-width="16" stroke-linecap="round"/>
+    <path d="M116,301 q35,-48 70,0 t70,0 t70,0 t70,0" fill="none" stroke="#6bdcff" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+    <path d="M116,397 q35,-48 70,0 t70,0 t70,0 t70,0" fill="none" stroke="#63736f" stroke-width="14" opacity="0.55" stroke-linecap="round"/>
   </g>
   <rect x="12" y="12" width="488" height="488" rx="96" fill="none" stroke="#2a363d" stroke-width="6"/>
 </svg>
