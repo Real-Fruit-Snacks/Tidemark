@@ -1,8 +1,8 @@
 <div align="center">
 
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-dark.svg" />
-    <img alt="Tidemark" src="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-light.svg" width="480" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-light.png" />
+    <img alt="Tidemark" src="https://raw.githubusercontent.com/Real-Fruit-Snacks/Tidemark/main/docs/assets/logo-dark.png" width="480" />
   </picture>
 
   **Replace `{{variables}}` in your Obsidian notes with values from YAML frontmatter — color-coded in the editor, resolved on demand.**
