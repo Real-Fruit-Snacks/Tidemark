@@ -2,6 +2,14 @@
 
 All notable changes to the Tidemark plugin will be documented in this file.
 
+## [1.0.6]
+
+### Added
+- Automated test suite (Vitest, 62 tests) covering the variable-replacement engine, frontmatter parsing, the prototype-pollution guards, the ReDoS delimiter caps, and filename sanitization. Continuous integration already ran the test step, but it previously had no tests to run.
+
+### Changed
+- Pinned the Obsidian API development dependency to a fixed version so builds are reproducible instead of tracking whatever `latest` resolves to.
+
 ## [1.0.5]
 
 ### Changed
